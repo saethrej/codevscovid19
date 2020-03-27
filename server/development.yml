@@ -1,0 +1,3 @@
+# example only loaded in development mode
+
+LOG_JSON: false

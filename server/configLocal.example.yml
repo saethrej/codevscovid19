@@ -1,0 +1,4 @@
+# rename this file to configLocal.yml to override configs just for your pc.
+# configLocal.yml itself should be in .gitignore and never commited. Thats why its called local!
+
+serverPort: 8080
