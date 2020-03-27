@@ -46,11 +46,11 @@ async function startup() {
   // await setupDB()
 
   const httpServer = http.createServer(app)
-  const options = {
-    key: fs.readFileSync('./cert/key.pem'),
-    cert: fs.readFileSync('./cert/cert.pem')
-  }
-  const httpsServer = https.createServer(options, app)
+  // const options = {
+  //  key: fs.readFileSync('./cert/key.pem'),
+  //  cert: fs.readFileSync('./cert/cert.pem')
+  // }
+  const httpsServer = https.createServer(app)
   //controllers for message controlling
   //middleware for authentication
   const ioserver = io()
