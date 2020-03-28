@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:core';
-
 import 'package:http/http.dart' as http;
 import 'package:tuple/tuple.dart';
 
@@ -27,15 +26,16 @@ class Information{
 class HTTPRequest {
 
   Map coordToID = new Map<int, Information>();
+  String server;
   
-  Future<Map<int, Information>> sendCoordinates(String server, Tuple2<double, double> position, Tuple2<double, double> left, Tuple2<double, double> right, Tuple2<double, double> up, Tuple2<double, double> down) async{
-    var jsonString = json.encode([{
+  Future<Map<int, Information>> sendCoordinates(Tuple2<double, double> position, Tuple2<double, double> left, Tuple2<double, double> right, Tuple2<double, double> up, Tuple2<double, double> down) async{
+    var jsonString = json.encode({
       "position": position,
       "up": up,
       "down": down,
       "right": right,
       "left": left
-    }]);
+    });
     final http.Response response = await http.post(server, headers: <String, String> {
       'Content-Type': 'application/json' },
       body: jsonString
@@ -50,10 +50,19 @@ class HTTPRequest {
       return coordToID;
     }
     else {
-      throw Exception("Failed to connect to server")
+      throw Exception("Failed to connect to server");
     }
-    void parseList(http.Response){
-      
+    
+
+    Future<List<DateTime>> requestTimes(int id, DateTime time) async{
+      var jsonString = json.encode({'id': id, 'hour': time.hour,
+      'minute': time.minute});
+      final http.Response response = await http.post(server, headers: <String, String> {
+      'Content-Type': 'application/json' },
+      body: jsonString);
+
+
+
     }
 
 
