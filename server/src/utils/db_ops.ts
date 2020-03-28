@@ -47,7 +47,7 @@ function db_disconnect(dbcon: any)
  * 
  * @param {*} dbcon the database connection
  */
-export async function db_getNumStores(dbcon: any, callback: any)
+export function db_getNumStores(dbcon: any, callback: any)
 {
     var sql = "SELECT count(*) FROM Stores";
     dbcon.query(sql, function(err:any, result:any) {
@@ -76,3 +76,10 @@ function db_getStoresWithinRadius(dbcon: any, pos: any, radius: any)
 }
 
 
+export function db_increase(dbcon: any, store_id: any, callback: any){
+    return callback(true);
+}
+
+export function db_decrease(dbcon: any, store_id: any, callback: any){
+    return callback(true);
+}
