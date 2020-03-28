@@ -47,29 +47,9 @@ function db_disconnect(dbcon: any)
  * 
  * @param {*} dbcon the database connection
  */
-export async function test_db_getNumStores(dbcon:any)
-{
-    var sql = "SELECT count(*) FROM Stores";
-    var ret:any[] = [];
-    await dbcon.query(sql, function(err:any, result:any, fields:any) {
-        if (err) throw err;
-        ret.push(result[0]['count(*)']);
-    });
-
-    return ret[0];
-}
-
 export async function db_getNumStores(dbcon: any, callback: any)
 {
     var sql = "SELECT count(*) FROM Stores";
-    const rows = await dbcon.query(sql, function(err: any, result: any){
-        if (err) {
-            throw err;
-        }
-    });
-
-    //console.log(rows);
-    console.log('this was top')
     dbcon.query(sql, function(err:any, result:any) {
         if (err) {
             throw err;
