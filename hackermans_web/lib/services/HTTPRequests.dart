@@ -74,12 +74,6 @@ class HTTPRequest {
       else {
         throw Exception ("Failed to connect to server");
       }
-
-
-
     }
 
-
-
-  
 }
