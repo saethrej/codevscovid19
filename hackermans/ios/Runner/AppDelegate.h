@@ -1,13 +1,6 @@
-//
-//  AppDelegate.h
-//  Runner
-//
-//  Created by Livio Schläpfer on 28.03.20.
-//  Copyright © 2020 The Chromium Authors. All rights reserved.
-//
+#import <Flutter/Flutter.h>
+#import <UIKit/UIKit.h>
 
-#ifndef AppDelegate_h
-#define AppDelegate_h
+@interface AppDelegate : FlutterAppDelegate
 
-
-#endif /* AppDelegate_h */
+@end
