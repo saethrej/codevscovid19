@@ -1,33 +1,36 @@
 module.exports = function (app: any) {
-    var counter = require('./counter');
+    var counter = require('./counter')
 
     // todoList Routes
 
-    app.route('/counterup')
-        .post(counter.up);
+    app.route('/counterup/:storeId')
+        .get(counter.up)
 
-    app.route('/counterdown')
-        .post(counter.down);
+    app.route('/counterdown/:storeId')
+        .get(counter.down)
 
-    var QRCode = require('./QRCode');
+    app.route('/getcounter/:storeId')
+        .get(counter.value)
+
+    var QRCode = require('./QRCode')
 
     app.route('/checkQRCode')
-        .post(QRCode.check);
+        .post(QRCode.check)
     
-    var stores = require('./stores');
+    var stores = require('./stores')
 
     app.route('/getLocations')
-        .post(stores.locations);
+        .post(stores.locations)
 
     app.route('/getStoreData/:storeId')
-        .get(stores.dat);
+        .get(stores.dat)
 
-    var reservations = require('./reservations');
+    var reservations = require('./reservations')
 
     app.route('/preReservation')
-        .post(reservations.pre);
+        .post(reservations.pre)
     
     app.route('/getReservation')
-        .post(reservations.confirm);
+        .post(reservations.confirm)
 
-};
+}
