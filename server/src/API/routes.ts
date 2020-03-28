@@ -3,11 +3,14 @@ module.exports = function (app: any) {
 
     // todoList Routes
 
-    app.route('/counterup')
-        .post(counter.up);
+    app.route('/counterup/:storeId')
+        .get(counter.up);
 
-    app.route('/counterdown')
-        .post(counter.down);
+    app.route('/counterdown/:storeId')
+        .get(counter.down);
+
+    app.route('/getcounter/:storeId')
+        .get(counter.value);
 
     var QRCode = require('./QRCode');
 
