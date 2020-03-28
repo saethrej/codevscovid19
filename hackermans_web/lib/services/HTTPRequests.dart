@@ -3,7 +3,7 @@ import 'dart:core';
 
 import 'package:http/http.dart' as http;
 import 'package:tuple/tuple.dart';
-
+/*
 class Information{
   double longitude;
   double latitude;
@@ -60,3 +60,4 @@ class HTTPRequest {
 
   }
 }
+*/

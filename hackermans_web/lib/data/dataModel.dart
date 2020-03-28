@@ -9,5 +9,10 @@ class PageData with ChangeNotifier{
     this.storeID = storeID;
     notifyListeners();
   }
+
+  void toggleStoreDetail() {
+    storeSelected = !storeSelected;
+    notifyListeners();
+  }
 }
   

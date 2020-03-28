@@ -45,6 +45,8 @@ class WebSite extends StatelessWidget{
 class PageElements extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
+    final pageData = Provider.of<PageData>(context);
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(25.0),
@@ -52,7 +54,7 @@ class PageElements extends StatelessWidget{
           child: Row(
             children: <Widget>[
               SearchList(),
-              StoreDetail()
+              (!pageData.storeSelected) ? Container(height: 0, width: 0) : StoreDetail()
             ],
           ),
         ),

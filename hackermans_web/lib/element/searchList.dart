@@ -1,6 +1,8 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:hackermans_web/data/dataModel.dart';
+import 'package:provider/provider.dart';
 
 import '../styles.dart';
 
@@ -44,27 +46,34 @@ class _SearchListState extends State<SearchList> {
   }
 
   Widget _listBody(BuildContext context){
+    final pageData = Provider.of<PageData>(context);
+
     return Expanded(
       child: ListView.builder(
         itemCount: 20,
         itemBuilder: (context, index){
-          return Card(
-            child: ListTile(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text('500m', style: Styles.smalltext),
-                  Text('Migros Rapperswil', style: Styles.headline),
-                ],
-              ),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text('Slots', style: Styles.smalltext),
-                  Text('20', style: Styles.headline),
-                ],
-              ),
-            )
+          return GestureDetector(
+            onTap: () {
+              pageData.toggleStoreDetail();
+            },
+            child: Card(
+              child: ListTile(
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text('500m', style: Styles.smalltext),
+                    Text('Migros Rapperswil', style: Styles.headline),
+                  ],
+                ),
+                trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text('Slots', style: Styles.smalltext),
+                    Text('20', style: Styles.headline),
+                  ],
+                ),
+              )
+            ),
           );
         },
       )
