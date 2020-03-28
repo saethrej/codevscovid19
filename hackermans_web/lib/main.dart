@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hackermans_web/styles.dart';
+import 'package:mapbox_gl_dart/mapbox_gl_dart.dart';
 import 'package:provider/provider.dart';
 
 
@@ -10,6 +11,8 @@ import 'element/storeMap.dart';
 import 'element/storedetail/storeDetail.dart';
 
 void main() {
+  Mapbox.accessToken = 'pk.eyJ1IjoibGl2aW9zIiwiYSI6ImNrNDdmdHJvNzBheGYza3BhejFkdGk0eG8ifQ.qG49BQpVKLCJWf7N-cMLHQ';
+
   runApp(MyApp());
 }
 
