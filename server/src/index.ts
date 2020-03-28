@@ -14,6 +14,8 @@ import https from 'https'
 import fs from 'fs'
 import http from 'http'
 
+import bodyParser = require('body-parser');
+
 // import { setupDB } from './utils/database'
 
 // global listener to log uncaught exceptions
@@ -39,6 +41,18 @@ useExpressServer(app, {
 // last listener for error handling
 // error handler
 app.use(errorMiddleware)
+
+app.get('/', function (req, res) {
+  logger.info("Got a GET request for the homepage");
+  let name = __dirname
+  res.sendFile(name.substring(0, name.length - 6) + '/src/index.html');
+})
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+var routes = require('./API/routes'); //importing route
+routes(app); //register the route
 
 // log all remaining unhandled errors
 // app.use(ewinston.errorLogger({ winstonInstance: logger }))

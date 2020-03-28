@@ -24,6 +24,10 @@ export class MessageController {
     @ConnectedSocket() socket: Socket,
     @SocketIO() socketIO: sIO.Server
   ) {
+    socket.on('chat message', function(msg){
+      logger.info('Message:' + msg);
+      socket.emit('chat message', 'You suck');
+    });
   }
 
   
@@ -32,7 +36,7 @@ export class MessageController {
     @ConnectedSocket() socket: Socket,
     @SocketIO() io: SocketIO.Server
   ) {
-
+    logger.info("Connection closed");
   }
     
 }
