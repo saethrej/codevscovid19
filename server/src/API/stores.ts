@@ -2,31 +2,29 @@
 
 import { logger } from '../logger'
 import {Request, Response} from "express"
-import { db_getNumStores } from '../utils/db_ops';
-import { test_db_getNumStores } from '../utils/db_ops';
+import { db_getNumStores } from '../utils/db_ops'
 
 exports.locations = function(req: Request, res: Response) {
-    let position = req.body.position;
-    let height = req.body.mapHeight;
-    let width = req.body.mapWidth;
-    let zoom = req.body.zoom;
-    // start of logic
-    let stores = [{
-        'store_id': 42,
-        'longitutude': 47.395481,
-        'latitude': 8.540280,
-        'capacity_left': 10
-    }]; // sqlquery db.getlocations(position, height, width, zoom)
+    let position = req.body.position; // [double, double]
+    let up = req.body.up; // [double, double]
+    let down = req.body.down; // [double, double]
+    let right = req.body.right; // [double, double]
+    let left = req.body.left; // [double, double]
+    // sqlquery db.getlocations(position, height, width, zoom)
     let storenr = '';
+    let stores = [{
+        'longitutude': 47.395481, //double
+        'latitude': 8.540280, //double
+        'numPeople': 10, //int
+        'id': 42 //int
+    }]; 
     db_getNumStores(DB, function(result: any){
         storenr = result[0]['count(*)'];
         console.log(storenr);
         let reply = {
             'status': 'success',
             'stores_n': storenr,
-            'stores': [ 
-                stores
-            ]
+            'stores': stores
         };
         res.end(JSON.stringify(reply))
     });

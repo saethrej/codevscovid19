@@ -2,23 +2,20 @@
 
 import { logger } from '../logger'
 import {Request, Response} from "express"
+import {db_increase, db_decrease} from '../utils/db_ops'
 
 exports.up = function(req: Request, res: Response) {
-    logger.info(req + ' Got a POST conterup request');
-    let storeid = req.body.storeid
-    let err = true//db logic countup(dbconnection, storeid)
-    if (err)
-        res.end(JSON.stringify("['status': 'False']"));
-    else
-        res.end(JSON.stringify("['status': 'True']"));
-  };
+    let id = req.params.id;
+    let status = 'fail'
+    db_increase(DB, id, function(result: any){
+        res.end(JSON.stringify({'success': result}));
+    });
+}
 
 exports.down = function(req: Request, res: Response) {
-    logger.info(req + ' Got a POST counterdown request');
-    let storeid = req.body.storeid
-    let err = true//db logic countdown(dbconnection, storeid)
-    if (err)
-        res.end(JSON.stringify("['status': 'False']"));
-    else
-        res.end(JSON.stringify("['status': 'True']"));
+    let id = req.params.id;
+    let status = 'fail'
+    db_decrease(DB, id, function(result: any){
+        res.end(JSON.stringify({'success': result}));
+    });
 }

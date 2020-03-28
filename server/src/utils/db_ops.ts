@@ -141,3 +141,10 @@ export function db_counterDown(dbcon: any, store_id: number, callback: any)
 
 
 
+export function db_increase(dbcon: any, store_id: any, callback: any){
+    return callback(true);
+}
+
+export function db_decrease(dbcon: any, store_id: any, callback: any){
+    return callback(true);
+}
