@@ -9,6 +9,9 @@ module.exports = function (app: any) {
     app.route('/counterdown/:storeId')
         .get(counter.down);
 
+    app.route('/getcounter/:storeId')
+        .get(counter.value);
+
     var QRCode = require('./QRCode');
 
     app.route('/checkQRCode')
