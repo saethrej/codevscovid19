@@ -124,8 +124,8 @@ export function db_increase(dbcon: any, store_id: number, callback: any)
 /** brief: attempts to decrement the store counter
  * 
  * @param {*} dbcon the database connection 
- * @param callback function from the caller to return result
  * @param store_id the unique id of the store
+ * @param callback function from the caller to return result
  * @returns true if successful, false otherwise
  */
 export function db_decrease(dbcon: any, store_id: number, callback: any)
@@ -147,41 +147,86 @@ export function db_decrease(dbcon: any, store_id: number, callback: any)
     });
 }
 
-/**
+/** brief: returns the current number of people in the store
  * 
- * @param dbcon 
- * @param store_id 
- * @param callback 
+ * @param dbcon the database connection 
+ * @param store_id id of the store
+ * @param callback function from the caller to return result 
  * @returns {number} amount of people in corresponding store
+ * 
+ * @throws exception if the query fails 
  */
 export function db_getPeopleInStore(dbcon: any, store_id: number, callback: any)
 {
-
+    var sql = "GET people_in_store FROM Stores WHERE store_id = ?";
+    dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
+        if (err) {
+            logger.error(err);
+            throw err; // throw error
+        }
+        callback(result[0]['people_in_store']);
+    });
 }
 
-/**
+/** brief: checks whether a reservation is valid for the current time or not.
+ *         the method allows a flexibility of +/- 10 minutes
  * 
- * @param dbcon 
- * @param store_id 
- * @param reservation_id 
- * @param callback 
+ * @param dbcon the database connection
+ * @param store_id id of the store
+ * @param reservation_id id of the reservation (hash)
+ * @param callback function from the caller to return result
  * @returns {boolean} true if reservation is valid, false otherwise
  */
 export function db_checkReservation(dbcon: any, store_id: number, reservation_id: any, callback: any)
 {
+    var sql = "SELECT * FROM Reservations \
+                WHERE store_id = ? \
+                AND qr_hash = ? \
+                AND date = CURDATE() \
+                AND reservation_time > CURRENT_TIME() - 600 \
+                AND reservation_time < CURRENT_TIME() + 600";
 
+    dbcon.query(sql, [store_id, reservation_id], function(err: any, result: any, fields: any) {
+        // return false in case an error occurred
+        if (err) {
+            logger.error(err);
+            callback(false); 
+            return;
+        }
+        // return true if exactly one entry exists
+        if (result.length == 1) {
+            callback(true);
+        } else {
+            callback(false);
+        }
+
+    });
 }
 
-/**
+/** brief: returns the store data, i.e. its information and opening hours
  * 
- * @param dbcon 
- * @param store_id 
- * @param callback 
- * @returns JSON-object containing rows of the form {Stores joined with OpeningHours}
+ * @param dbcon the database connection
+ * @param store_id id of the store
+ * @param callback function from the caller to return result
+ * @returns list containing 1 row of the form {Stores joined with OpeningHours}
+ * 
+ * @throws exception if sql query fails
  */
 export function db_getStoreData(dbcon: any, store_id: number, callback: any)
 {
-
+    var sql = "SELECT * FROM Stores, Opening_Hours \
+                WHERE Store.store_id = ? \
+                AND Stores.store_id = Opening_Hours.store_id";
+    
+    dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
+        // return false in case an error occurred
+        if (err) {
+            logger.error(err);
+            throw err;
+        }
+        // return the result of the query
+        callback(result);
+    })
 }
 
 /**
