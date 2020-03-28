@@ -34,7 +34,7 @@ class _SearchListState extends State<SearchList> {
         icon: Icon(Icons.search),
         labelText: 'Search store or location',
         suffixIcon: (_controllerSearchField.text.isEmpty) ? null : IconButton(
-          icon: Icon(Icons.clear), 
+          icon: Icon(Icons.cancel), 
           onPressed: () => _controllerSearchField.clear()
         )
       ),
@@ -80,7 +80,7 @@ class _SearchListState extends State<SearchList> {
           width: (MediaQuery.of(context).size.width / 5 < 300) ? 300 : MediaQuery.of(context).size.width / 5 ,
           color: Colors.white,
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.only(top: 16.0,left: 16.0,right: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[

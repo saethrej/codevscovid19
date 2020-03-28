@@ -36,7 +36,6 @@ class WebSite extends StatelessWidget{
         children: <Widget>[
           StoreMap(),
           PageElements(),
-          
         ]
       ),
     );
@@ -49,11 +48,13 @@ class PageElements extends StatelessWidget{
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(25.0),
-        child: Row(
-          children: <Widget>[
-            SearchList(),
-            StoreDetail()
-          ],
+        child: Expanded(
+          child: Row(
+            children: <Widget>[
+              SearchList(),
+              StoreDetail()
+            ],
+          ),
         ),
       )
     );
