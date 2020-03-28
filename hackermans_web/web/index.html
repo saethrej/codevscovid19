@@ -16,11 +16,28 @@
 
   <title>hackermans_web</title>
   <link rel="manifest" href="manifest.json">
+
+  <!--used for MapBox-->
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet'/>
+  <style>
+    html, body, #map {
+      height: '100%';
+      width: '100%';
+      margin: 0px;
+      padding: 0px
+    }
+  </style>
+  <!--used for MapBox-->
+
 </head>
 <body>
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
+  
+  <div id='map'></div>
+
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
@@ -29,5 +46,6 @@
     }
   </script>
   <script src="main.dart.js" type="application/javascript"></script>
+  
 </body>
 </html>

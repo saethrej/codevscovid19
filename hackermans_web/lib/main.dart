@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hackermans_web/styles.dart';
+import 'package:mapbox_gl_dart/mapbox_gl_dart.dart';
 import 'package:provider/provider.dart';
 
 
@@ -10,6 +11,8 @@ import 'element/storeMap.dart';
 import 'element/storedetail/storeDetail.dart';
 
 void main() {
+  Mapbox.accessToken = 'pk.eyJ1IjoibGl2aW9zIiwiYSI6ImNrNDdmdHJvNzBheGYza3BhejFkdGk0eG8ifQ.qG49BQpVKLCJWf7N-cMLHQ';
+
   runApp(MyApp());
 }
 
@@ -36,7 +39,6 @@ class WebSite extends StatelessWidget{
         children: <Widget>[
           StoreMap(),
           PageElements(),
-          
         ]
       ),
     );
@@ -46,14 +48,18 @@ class WebSite extends StatelessWidget{
 class PageElements extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
+    final pageData = Provider.of<PageData>(context);
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(25.0),
-        child: Row(
-          children: <Widget>[
-            SearchList(),
-            StoreDetail()
-          ],
+        child: Expanded(
+          child: Row(
+            children: <Widget>[
+              SearchList(),
+              (!pageData.storeSelected) ? Container(height: 0, width: 0) : StoreDetail()
+            ],
+          ),
         ),
       )
     );

@@ -10,6 +10,14 @@ abstract class Styles {
     fontWeight: FontWeight.bold,
   );
 
+  static const TextStyle headlineLight = TextStyle(
+    color: Colors.black,
+    fontSize: 16,
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeight.normal,
+  );
+
+
   static const TextStyle text = TextStyle(
     color: Colors.black,
     fontSize: 12,
