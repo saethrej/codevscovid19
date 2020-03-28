@@ -9,12 +9,11 @@ import { stream } from "winston";
 // we require the mysql library
 const mysql = require('mysql');
 
-/** @brief initiates a database connection and returns the connection object that
-            has to be passed in all subsequent functions.
-*/
 
-/** brief: initiates database connection and returns connection object
- */
+/** brief: initiates a database connection and returns connection object 
+ * 
+ * @returns connection object
+*/
 export function db_connect() 
 {
     var connection = mysql.createConnection({
@@ -45,6 +44,7 @@ function db_disconnect(dbcon: any)
  * 
  * @param {*} dbcon the database connection
  * @param {*} callback function from the caller to return result
+ * @returns {number} number of stores in database
  */
 export function db_getNumStores(dbcon: any, callback: any)
 {
@@ -62,10 +62,10 @@ export function db_getNumStores(dbcon: any, callback: any)
  *         of the current position
  * 
  * @param {MySQL connection} dbcon the database connection
- * @param {callback fn} callback function from the caller to return result
  * @param {*} pos the target location (long, lat)
  * @param {number} radius the radius to search for stores in [km]
- * @returns (store_id, long, lat) triplets of stores that meet criteria
+ * @param {callback fn} callback function from the caller to return result
+ * @returns JSON-object containing rows of the form {store_id, longitude, latitude}
  */
 export function db_getStoresWithinRadius(dbcon: any, pos: any, radius: number, callback: any)
 {
@@ -79,9 +79,10 @@ export function db_getStoresWithinRadius(dbcon: any, pos: any, radius: number, c
 /** brief: returns a list of stores (store_id, long, lat) that are currently visible on the map
  * 
  * @param dbcon the database connection
+ * @param pos JSON-object {long, lat}
+ * @param rect JSON-object with 4 rows {up: {long, lat}, down ...}
  * @param callback function from the caller to return result
- * @param pos the target position of the user
- * @param rect a list of 4 coordinates (long, lat) that bounds the visible area of the map
+ * @returns JSON-object containing rows of the form {store_id, longitude, latitude} 
  */
 export function db_getStoresInRectangle(dbcon: any, pos: any, rect: any, callback: any)
 {
@@ -96,8 +97,8 @@ export function db_getStoresInRectangle(dbcon: any, pos: any, rect: any, callbac
 /** brief: attempts to increment the store counter
  * 
  * @param {*} dbcon the database connection
- * @param {callback fn} callback function from the caller to return result
  * @param {*} store_id the unique id of the store
+ * @param {callback fn} callback function from the caller to return result
  * @returns true if successful, false otherwise
  */
 export function db_increase(dbcon: any, store_id: number, callback: any)
@@ -136,3 +137,59 @@ export function db_decrease(dbcon: any, store_id: number, callback: any)
         }
     });
 }
+
+/**
+ * 
+ * @param dbcon 
+ * @param store_id 
+ * @param callback 
+ * @returns {number} amount of people in corresponding store
+ */
+export function db_getPeopleInStore(dbcon: any, store_id: number, callback: any)
+{
+
+}
+
+/**
+ * 
+ * @param dbcon 
+ * @param store_id 
+ * @param reservation_id 
+ * @param callback 
+ * @returns {boolean} true if reservation is valid, false otherwise
+ */
+export function db_checkReservation(dbcon: any, store_id: number, reservation_id: any, callback: any)
+{
+
+}
+
+/**
+ * 
+ * @param dbcon 
+ * @param store_id 
+ * @param callback 
+ * @returns JSON-object containing rows of the form {Stores joined with OpeningHours}
+ */
+export function db_getStoreData(dbcon: any, store_id: number, callback: any)
+{
+
+}
+
+/**
+ * 
+ * @param dbcon 
+ * @param store_id 
+ * @param date 
+ * @param time 
+ * @param email 
+ * @param callback 
+ * @returns JSON-object containing row of reservation if succesful, otherwise {}
+ */
+export function db_makeReservation(dbcon:any, store_id: number, date: string, time: string, email: string, callback:any) {
+
+}
+
+
+
+
+
