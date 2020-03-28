@@ -100,7 +100,7 @@ export function db_getStoresInRectangle(dbcon: any, pos: any, rect: any, callbac
  * @param {*} store_id the unique id of the store
  * @returns true if successful, false otherwise
  */
-export function db_counterUp(dbcon: any, store_id: number, callback: any)
+export function db_increase(dbcon: any, store_id: number, callback: any)
 {
     var sql = "UPDATE Stores SET people_in_store = people_in_store + 1 \
                  WHERE store_id = ?";
@@ -122,7 +122,7 @@ export function db_counterUp(dbcon: any, store_id: number, callback: any)
  * @param store_id the unique id of the store
  * @returns true if successful, false otherwise
  */
-export function db_counterDown(dbcon: any, store_id: number, callback: any)
+export function db_decrease(dbcon: any, store_id: number, callback: any)
 {
     var sql = "UPDATE Stores SET people_in_store = people_in_store - 1 \
                  WHERE store_id = ?";
@@ -135,16 +135,4 @@ export function db_counterDown(dbcon: any, store_id: number, callback: any)
             callback(false);
         }
     });
-}
-
-
-
-
-
-export function db_increase(dbcon: any, store_id: any, callback: any){
-    return callback(true);
-}
-
-export function db_decrease(dbcon: any, store_id: any, callback: any){
-    return callback(true);
 }
