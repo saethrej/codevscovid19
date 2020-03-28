@@ -9,6 +9,8 @@ import logo from './logo.svg'
 import './App.css'
 import { observable, action } from 'mobx'
 import { appState } from './appState'
+import { Circle } from 'react-leaflet'
+import { LatLngTuple } from 'leaflet'
 
 @observer
 class MapDrawer extends React.Component {
@@ -17,19 +19,34 @@ class MapDrawer extends React.Component {
   }
   render() {
     return (
-      <Map center={appState.position} zoom={13}>
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        />
-        <Marker position={appState.position}>
-          <Popup>
-            A pretty CSS3 popup.
-            <br />
-            Easily customizable.
-          </Popup>
-        </Marker>
-      </Map>
+      <div ref={appState.mapContainerRef}>
+        <Map center={appState.position} zoom={13}>
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          />
+          <ul>
+            {Array.from(appState.IDLocMap.keys()).map(function(
+              elem: LatLngTuple,
+              index: number
+            ) {
+              return (
+                <div key={index}>
+                  <Circle center={elem} radius={100}></Circle>
+                </div>
+              )
+            })}
+          </ul>
+          <Circle center={appState.position} radius={100}></Circle>
+          <Marker position={appState.position}>
+            <Popup>
+              A pretty CSS3 popup.
+              <br />
+              Easily customizable.
+            </Popup>
+          </Marker>
+        </Map>
+      </div>
     )
   }
 }
