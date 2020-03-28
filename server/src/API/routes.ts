@@ -6,7 +6,7 @@ module.exports = function (app: any) {
     app.route('/counterup/:storeId')
         .get(counter.up);
 
-    app.route('/counterdown/storeId')
+    app.route('/counterdown/:storeId')
         .get(counter.down);
 
     var QRCode = require('./QRCode');

@@ -1,4 +1,5 @@
 import { stream } from "winston";
+import { logger } from '../logger'
 
 /* Project: CodeVsCovid-19
    Author:  saethrej
@@ -105,7 +106,11 @@ export function db_increase(dbcon: any, store_id: number, callback: any)
     var sql = "UPDATE Stores SET people_in_store = people_in_store + 1 \
                  WHERE store_id = ?";
     dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
-        if (err) throw err;
+        if (err) {
+            logger.error(err);
+            callback(false);
+            return;
+        }
         // check whether the update was successful or not
         if (result.affectedRows == 1 && result.warningCount == 0) {
             callback(true);
@@ -127,7 +132,11 @@ export function db_decrease(dbcon: any, store_id: number, callback: any)
     var sql = "UPDATE Stores SET people_in_store = people_in_store - 1 \
                  WHERE store_id = ?";
     dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
-        if (err) throw err;
+        if (err) {
+            logger.error(err);
+            callback(false);
+            return;
+        }
         // check whether the update was successful or not
         if (result.affectedRows == 1 && result.warningCount == 0) {
             callback(true);
