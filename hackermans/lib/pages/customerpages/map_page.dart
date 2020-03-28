@@ -4,11 +4,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hackermans/pages/store_page.dart';
+import 'package:hackermans/pages/customerpages/storeCustomer_page.dart';
+import 'package:hackermans/pages/ownerpages/storeOwner_page.dart';
 
 import 'package:hackermans/src/locations.dart' as locations;
 
-import '../styles.dart';
 
 class MapPage extends StatelessWidget{
   @override
@@ -36,7 +36,7 @@ class _FullMapState extends State<FullMap> {
           onTap: () {
             Navigator.push(
               context, 
-              MaterialPageRoute(builder: (BuildContext context) => StorePage())
+              MaterialPageRoute(builder: (BuildContext context) => StoreCustomerPage())
             );
           }
         );
@@ -49,6 +49,7 @@ class _FullMapState extends State<FullMap> {
   Widget build(BuildContext context) {
     return GoogleMap(
       onMapCreated: _onMapCreated,
+      myLocationEnabled: true,
       initialCameraPosition: CameraPosition(
         target: const LatLng(0, 0),
         zoom: 2,

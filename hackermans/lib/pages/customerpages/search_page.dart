@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hackermans/pages/login_page.dart';
+import 'package:hackermans/pages/ownerpages/login_page.dart';
 import 'package:hackermans/styles.dart';
 
-class HomePage extends StatelessWidget{
+class SearchPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
-    return HomePageBody();
+    return SearchPageBody();
   }
 }
 
-class HomePageBody extends StatefulWidget {
+class SearchPageBody extends StatefulWidget {
 
   @override
-  _HomePageBodyState createState() => _HomePageBodyState();
+  _SearchPageBodyState createState() => _SearchPageBodyState();
 }
 
-class _HomePageBodyState extends State<HomePageBody> {
+class _SearchPageBodyState extends State<SearchPageBody> {
   TextEditingController _controllerSearchField;
 
   @override
@@ -64,6 +64,7 @@ class _HomePageBodyState extends State<HomePageBody> {
         itemCount: 20,
         itemBuilder: (context, index){
           return Card(
+            elevation: 2,
             child: ListTile(
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,7 +96,12 @@ class _HomePageBodyState extends State<HomePageBody> {
           padding: const EdgeInsets.all(25.0),
           child: Column(
             children: <Widget>[
-              Text('Hackermans', style: Styles.header,),
+              Row(
+                children: <Widget>[
+                  CupertinoNavigationBarBackButton(color: Colors.black,),
+                  Text('Hackermans', style: Styles.header,),
+                ],
+              ),
               SizedBox(height: 30),
               _searchField(context),
               SizedBox(height: 20),

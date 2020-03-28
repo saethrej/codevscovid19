@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:hackermans/pages/store_page.dart';
+import 'package:hackermans/pages/ownerpages/storeOwner_page.dart';
 
-import '../styles.dart';
+import '../../styles.dart';
+
 
 
 class LoginPage extends StatefulWidget{
