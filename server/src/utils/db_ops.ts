@@ -1,3 +1,5 @@
+import { stream } from "winston";
+
 /* Project: CodeVsCovid-19
    Author:  saethrej
    Date:    28.03.2020
@@ -13,7 +15,7 @@ const mysql = require('mysql');
 
 /** brief: initiates database connection and returns connection object
  */
-function db_connect() 
+export function db_connect() 
 {
     var connection = mysql.createConnection({
         host: 'jenseir1.mysql.db.hostpoint.ch',
@@ -22,7 +24,7 @@ function db_connect()
         database: 'jenseir1_codevscovid19'
     });
     
-    connection.connect((err) => {
+    connection.connect((err: any) => {
         if (err) throw err;
     });
 
@@ -30,11 +32,13 @@ function db_connect()
     return connection;
 }
 
+
+
 /** brief: disconnects the server from the database
  * 
  * @param {*} dbcon the database connection
  */
-function db_disconnect(dbcon)
+function db_disconnect(dbcon: any)
 {
     dbcon.end();
 }
@@ -43,14 +47,37 @@ function db_disconnect(dbcon)
  * 
  * @param {*} dbcon the database connection
  */
-function db_getNumStores(dbcon)
+export async function test_db_getNumStores(dbcon:any)
 {
     var sql = "SELECT count(*) FROM Stores";
-    dbcon.query(sql, function(err, result, fields) {
+    var ret:any[] = [];
+    await dbcon.query(sql, function(err:any, result:any, fields:any) {
         if (err) throw err;
+        ret.push(result[0]['count(*)']);
     });
 
-    return result;
+    return ret[0];
+}
+
+export async function db_getNumStores(dbcon: any, callback: any)
+{
+    var sql = "SELECT count(*) FROM Stores";
+    const rows = await dbcon.query(sql, function(err: any, result: any){
+        if (err) {
+            throw err;
+        }
+    });
+
+    //console.log(rows);
+    console.log('this was top')
+    dbcon.query(sql, function(err:any, result:any) {
+        if (err) {
+            throw err;
+        }
+        console.log(result);
+        return callback(result);
+    });
+
 }
 
 /** brief: returns a list of stores (store_id, long, lat) within a certain radius
@@ -60,7 +87,7 @@ function db_getNumStores(dbcon)
  * @param {*} pos the target location (long, lat)
  * @param {number} radius the radius to search for stores in [km]
  */
-function db_getStoresWithinRadius(dbcon, pos, radius)
+function db_getStoresWithinRadius(dbcon: any, pos: any, radius: any)
 {
     
     var sql = "SELECT store_id, longitude, latitude \

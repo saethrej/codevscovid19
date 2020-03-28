@@ -14,9 +14,16 @@ import https from 'https'
 import fs from 'fs'
 import http from 'http'
 
-import bodyParser = require('body-parser');
+import bodyParser = require('body-parser')
 
 // import { setupDB } from './utils/database'
+
+import { db_connect } from './utils/db_ops'
+
+// var connection = dataBase.connect(); 
+
+const db = db_connect();
+global.DB = db;
 
 // global listener to log uncaught exceptions
 process.on('uncaughtException', function(err) {
