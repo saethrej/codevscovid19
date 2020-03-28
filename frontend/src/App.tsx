@@ -7,30 +7,16 @@ import 'reflect-metadata'
 import logo from './logo.svg'
 import './App.css'
 import { observable, action } from 'mobx'
+import { appState } from './appState'
+import { LatLngTuple } from 'leaflet'
+import MapDrawer from './MapDrawer'
 
 @observer
 class App extends React.Component {
-  @observable
-  text: string = 'bla'
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn asdsad
-            {this.text}
-          </a>
-          <button onClick={this.try}> Connect</button>
-        </header>
+        <MapDrawer></MapDrawer>
       </div>
     )
   }
@@ -56,7 +42,7 @@ class App extends React.Component {
   @bind
   @action
   httpResp(bla: string) {
-    this.text = bla
+    return
   }
 }
 
