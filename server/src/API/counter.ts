@@ -4,15 +4,21 @@ import { logger } from '../logger'
 import {Request, Response} from "express"
 
 exports.up = function(req: Request, res: Response) {
-    logger.info(req + ' Got a GET conterup request');
-    var counter = 0; //Getcounter
-    counter += 1; //incrementcounter
-    res.end(JSON.stringify("['status': 'True']"))
+    logger.info(req + ' Got a POST conterup request');
+    let storeid = req.body.storeid
+    let err = true//db logic countup(dbconnection, storeid)
+    if (err)
+        res.end(JSON.stringify("['status': 'False']"));
+    else
+        res.end(JSON.stringify("['status': 'True']"));
   };
 
 exports.down = function(req: Request, res: Response) {
-    logger.info(req + ' Got a GET counterdown request');
-    var counter = 0;
-    counter -= 1;
-    res.end(JSON.stringify("['status': 'True']"))
+    logger.info(req + ' Got a POST counterdown request');
+    let storeid = req.body.storeid
+    let err = true//db logic countdown(dbconnection, storeid)
+    if (err)
+        res.end(JSON.stringify("['status': 'False']"));
+    else
+        res.end(JSON.stringify("['status': 'True']"));
 }

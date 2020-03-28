@@ -1,15 +1,13 @@
-import { strict } from "assert";
-
 module.exports = function (app: any) {
     var counter = require('./counter');
 
     // todoList Routes
 
     app.route('/counterup')
-        .get(counter.up);
+        .post(counter.up);
 
     app.route('/counterdown')
-        .get(counter.down);
+        .post(counter.down);
 
     var QRCode = require('./QRCode');
 
@@ -19,7 +17,7 @@ module.exports = function (app: any) {
     var stores = require('./stores');
 
     app.route('/getLocations')
-        .get(stores.locations);
+        .post(stores.locations);
 
     app.route('/getStoreData/:storeId')
         .get(stores.dat);
