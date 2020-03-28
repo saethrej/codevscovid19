@@ -12,12 +12,12 @@ import { db_increase, db_decrease, db_getPeopleInStore } from '../utils/db_ops'
  * @returns -
  */
 exports.up = function (req: Request, res: Response) {
-    let id: number = parseInt(req.params.storeId);
+    let id: number = parseInt(req.params.storeId)
     db_increase(DB, id, function (result_1: any) {
         db_getPeopleInStore(DB, id, function (result_2: any) {
-            res.end(JSON.stringify({ 'success': result_1, 'people_in_store': result_2 }));
-        });
-    });
+            res.end(JSON.stringify({ 'success': result_1, 'people_in_store': result_2 }))
+        })
+    })
 }
 
 /** brief: tries to decrement the store counter and returns current value
@@ -28,12 +28,12 @@ exports.up = function (req: Request, res: Response) {
  * @returns -
  */
 exports.down = function (req: Request, res: Response) {
-    let id: number = parseInt(req.params.storeId);
+    let id: number = parseInt(req.params.storeId)
     db_decrease(DB, id, function (result_1: any) {
         db_getPeopleInStore(DB, id, function (result_2: any) {
-            res.end(JSON.stringify({ 'success': result_1, 'people_in_store': result_2 }));
-        });
-    });
+            res.end(JSON.stringify({ 'success': result_1, 'people_in_store': result_2 }))
+        })
+    })
 }
 
 /** brief: returns current value
@@ -44,9 +44,9 @@ exports.down = function (req: Request, res: Response) {
  * @returns -
  */
 exports.value = function (req: Request, res: Response) {
-    let id: number = parseInt(req.params.storeId);
+    let id: number = parseInt(req.params.storeId)
     let status = 'fail'
     db_getPeopleInStore(DB, id, function (result: any) {
-        res.end(JSON.stringify({'success': true, 'people_in_store': result }));
-    });
+        res.end(JSON.stringify({'success': true, 'people_in_store': result }))
+    })
 }
