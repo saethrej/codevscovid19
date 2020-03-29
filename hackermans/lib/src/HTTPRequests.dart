@@ -11,7 +11,7 @@ class HTTPRequest {
   HTTPRequest._privateConstructor(){
   }
   static final HTTPRequest instance = HTTPRequest._privateConstructor();
-  static String server = '10.0.2.2:8000';
+  static String server = 'localhost:8000';
 
   factory HTTPRequest(){
     return instance;
@@ -20,7 +20,7 @@ class HTTPRequest {
   //@params tuple of latitude, longitude
   // return a mapping from store ID to its information
   Future<List<StoreInformation>> sendCoordinates(Tuple2<double, double> position, Tuple2<double, double> left, Tuple2<double, double> right, Tuple2<double, double> up, Tuple2<double, double> down) async{
-    final uri = Uri.http('10.0.2.2:8000', '/getLocations');
+    final uri = Uri.http('localhost:8000', '/getLocations');
     var jsonString = json.encode({
       "position": position.toList(),
       "up": up.toList(),
@@ -51,7 +51,7 @@ class HTTPRequest {
 
     //@TODO Needs header completion
     Future<List<Tuple2<String, int>>> requestTimes(int storeID, String date, String time) async{
-      final uri = Uri.http('10.0.2.2:8000', '/getavailableReservation');
+      final uri = Uri.http('localhost:8000', '/getavailableReservation');
       var jsonString = json.encode({'storeId': storeID, 'date': date,
       'time': time});
       final http.Response response = await http.post(uri, headers: <String, String> {

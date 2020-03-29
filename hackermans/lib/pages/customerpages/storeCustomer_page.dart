@@ -24,7 +24,7 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
   Duration refreshRate = Duration(seconds: 1);
   Timer timer;
 
-  bool loading = true;
+  bool loading = false;
   int currentUser;
   int maxUser = 30;
 

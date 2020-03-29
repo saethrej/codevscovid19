@@ -5,7 +5,8 @@ import 'package:hackermans/src/UtilClasses.dart';
 
 
 class AppData with ChangeNotifier{
-  int storeID = 0;
+  int storeID = 1;
+  String storeName = 'Migros Rapperswil';
   GoogleMapController controller;
   CameraUpdate cameraUpdate;
   bool setCameraUpdate = false;
