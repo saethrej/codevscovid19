@@ -70,6 +70,7 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
+        bottom: false,
         child: Padding(
           padding: const EdgeInsets.all(25.0),
           child: Column(

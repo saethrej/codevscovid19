@@ -14,7 +14,6 @@ class LoginPage extends StatefulWidget{
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   TextEditingController _controllerUsername = TextEditingController();
   TextEditingController _controllerPassword = TextEditingController();
@@ -78,14 +77,13 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(25.0),
           child: Column(
             children: <Widget>[
               SizedBox(height: 60,),
-              Text('Sigin', style: Styles.header,),
+              Text('Sign in', style: Styles.header,),
               SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -112,7 +110,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Text('Sigin'),
+                      child: Text('Sign in'),
                     ),
                   ],
                 ),

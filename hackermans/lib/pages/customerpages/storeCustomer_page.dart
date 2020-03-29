@@ -65,7 +65,7 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
             Center(child: Text('/${maxUser.toString()}', style: Styles.bigInfo,)),
           ],
         ),
-        Center(child: Text('Customers', style: Styles.text,)),
+        Center(child: Text('Available entries', style: Styles.text,)),
         SizedBox(height: 20),
         _reservationButton(context),
         SizedBox(height: 50),
