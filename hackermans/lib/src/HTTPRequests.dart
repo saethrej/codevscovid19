@@ -76,7 +76,7 @@ class HTTPRequest {
 
     // update the store counter in the database
     Future<bool> counterUp(int storeID) async{
-      final uri = Uri.http('10.0.2.2:8000', '/counterup/' + storeID.toString());
+      final uri = Uri.http(server, '/counterup/' + storeID.toString());
       final http.Response response = await http.get(uri);
       if(response.statusCode == 200){
         print(jsonDecode(response.body)['success']);
@@ -90,7 +90,7 @@ class HTTPRequest {
 
     // update the store counter in the database
     Future<bool> counterDown(int storeID) async{
-      final uri = Uri.http('10.0.2.2:8000', '/counterdown/' + storeID.toString());
+      final uri = Uri.http(server, '/counterdown/' + storeID.toString());
       final http.Response response = await http.get(uri);//, '/counterdown/' + storeID.toString());
       if(response.statusCode == 200){
         print(jsonDecode(response.body)['success']);
@@ -103,7 +103,7 @@ class HTTPRequest {
 
     // get store counter in the database
     Future<int> getCounter(int storeID) async {
-       final uri = Uri.http('10.0.2.2:8000', '/getcounter/' + storeID.toString());
+       final uri = Uri.http(server, '/getcounter/' + storeID.toString());
       final http.Response response = await http.get(uri, headers: {"Accept": "application/json"});
       if(response.statusCode == 200){
         print(jsonDecode(response.body)['people_in_store']);
@@ -117,7 +117,7 @@ class HTTPRequest {
 
   // call after scanning a qr code to check if reservation is valid
   Future<bool> checkReservationfromQRCode(int storeID, String reservationID, String date, String time) async {
-    final uri = Uri.http('10.0.2.2:8000', '/checkQRCode');
+    final uri = Uri.http(server, '/checkQRCode');
     var jsonString =  json.encode({'store_id': storeID, 'reservation_id': reservationID, 'date': date,
       'time': time});
       final http.Response response = await http.post(uri, headers: <String, String> {
@@ -133,14 +133,12 @@ class HTTPRequest {
 
   }
 
- 
-
   // reserve a slot for later reservation on success
   Future<TemporaryReservationObject> preReserve(int storeID, String date, String time) async {
     var jsonString =  json.encode({'storeId': storeID, 'date': date,
     'time': time});
     print(jsonString);
-     final uri = Uri.http('10.0.2.2:8000', '/reserveReservation');
+     final uri = Uri.http(server, '/reserveReservation');
     final http.Response response = await http.post(uri, headers: <String, String> {
     'Content-Type': 'application/json' },
     body: jsonString);

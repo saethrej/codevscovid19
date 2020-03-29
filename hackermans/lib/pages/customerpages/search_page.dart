@@ -18,7 +18,7 @@ class SearchPage extends StatefulWidget{
 class _SearchPageState extends State<SearchPage> {  
   TextEditingController controller = TextEditingController();
   
-  Duration refreshRate = Duration(seconds: 2);
+  Duration refreshRate = Duration(seconds: 3);
   Future<List<MapBoxPlace>> places;
   bool searching = false;
   Timer timer;
@@ -53,7 +53,7 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   void initState() {
-    //controller.addListener(() {placesSearch();});
+    controller.addListener(() {placesSearch();});
     //timer = Timer.periodic(refreshRate, (Timer t) => placesSearch());
     super.initState();
   }
