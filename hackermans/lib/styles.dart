@@ -10,6 +10,20 @@ abstract class Styles {
     fontWeight: FontWeight.bold,
   );
 
+  static const TextStyle headlineLight = TextStyle(
+    color: Colors.black,
+    fontSize: 16,
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeight.normal,
+  );
+
+  static const TextStyle headlineLightGrey = TextStyle(
+    color: Colors.grey,
+    fontSize: 16,
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeight.normal,
+  );
+
   static const TextStyle text = TextStyle(
     color: Colors.black,
     fontSize: 12,
@@ -59,6 +73,13 @@ abstract class Styles {
     fontWeight: FontWeight.w300,
   );
 
+   static const TextStyle headerLightGrey = TextStyle(
+    color: Colors.grey,
+    fontSize: 21,
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeight.w300,
+  );
+
   static const TextStyle bigInfo = TextStyle(
     color: Colors.black,
     fontSize: 80,
@@ -68,6 +89,13 @@ abstract class Styles {
 
   static const TextStyle bigInfoWhite = TextStyle(
     color: Colors.white,
+    fontSize: 80,
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeight.w300,
+  );
+
+  static const TextStyle bigInfoGrey = TextStyle(
+    color: Colors.grey,
     fontSize: 80,
     fontStyle: FontStyle.normal,
     fontWeight: FontWeight.w300,

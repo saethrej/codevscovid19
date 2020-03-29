@@ -21,6 +21,8 @@ dependencies:
     sdk: flutter
 
   qr_mobile_vision: ^0.3.1
+  mapbox_search: any
+  provider: any
   google_maps_flutter: ^0.5.25+2
   tuple: any
   table_calendar: ^2.2.3
@@ -28,7 +30,8 @@ dependencies:
   http: ^0.12.0+1
   json_serializable: ^2.0.2
 
-
+  uuid: 2.0.4
+  qr_flutter: ^3.1.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2

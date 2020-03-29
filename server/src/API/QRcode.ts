@@ -1,8 +1,11 @@
 //define database somehow
 
+/*
+
 import { logger } from '../logger'
 import {Request, Response} from "express"
 import {db_checkReservation, db_increase, db_getPeopleInStore} from '../utils/db_ops'
+
 
 /** brief: checks if hash of QR-code allows for entry. If yes, increments store counter
  * call with POST /checkQRCode
@@ -28,3 +31,4 @@ exports.check = function(req: Request, res: Response) {
         }
     })
 }
+

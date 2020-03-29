@@ -1,33 +1,27 @@
-module.exports = function (app: any) {
-    var counter = require('./counter')
+module.exports = function(app: any) {
+  var counter = require('./counter')
 
-    // todoList Routes
+  // todoList Routes
 
-    app.route('/counterup/:storeId')
-        .get(counter.up)
+  app.route('/counterup/:storeId').get(counter.up)
 
-    app.route('/counterdown/:storeId')
-        .get(counter.down)
+  app.route('/counterdown/:storeId').get(counter.down)
 
-    app.route('/getcounter/:storeId')
-        .get(counter.value)
+  app.route('/getcounter/:storeId').get(counter.value)
 
-    var QRCode = require('./QRCode')
+  var QRCode = require('./QRCode')
 
-    app.route('/checkQRCode')
-        .post(QRCode.check)
-    
-    var stores = require('./stores')
+  app.route('/checkQRCode').post(QRCode.check)
 
-    app.route('/getLocations')
-        .post(stores.locations)
+  var stores = require('./stores')
 
-    app.route('/getStoreData/:storeId')
-        .get(stores.dat)
+  app.route('/getLocations').post(stores.locations)
 
-    var reservations = require('./reservations')
-
-    app.route('/getavailableReservation')
+  app.route('/getStoreData/:storeId').get(stores.dat)
+  
+  var reservations = require('./reservations')
+  
+  app.route('/getavailableReservation')
         .post(reservations.available)
 
     app.route('/reserveReservation')
@@ -36,3 +30,4 @@ module.exports = function (app: any) {
     app.route('/confirmReservation')
         .post(reservations.confirm)
 }
+
