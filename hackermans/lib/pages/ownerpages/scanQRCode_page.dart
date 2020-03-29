@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hackermans/styles.dart';
 import 'package:flutter/rendering.dart';
+import 'package:hackermans/styles/styles.dart';
 
 
 import 'package:qr_mobile_vision/qr_camera.dart';

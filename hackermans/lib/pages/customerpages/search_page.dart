@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hackermans/data/appData.dart';
 import 'package:hackermans/pages/ownerpages/login_page.dart';
-import 'package:hackermans/src/locations.dart';
-import 'package:hackermans/styles.dart';
+import 'package:hackermans/styles/styles.dart';
 import 'package:mapbox_search/mapbox_search.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as maps;
@@ -19,6 +17,8 @@ class SearchPage extends StatefulWidget{
 
 class _SearchPageState extends State<SearchPage> {  
   TextEditingController controller = TextEditingController();
+  
+  Duration refreshRate = Duration(seconds: 2);
   Future<List<MapBoxPlace>> places;
   bool searching = false;
   Timer timer;
@@ -51,10 +51,10 @@ class _SearchPageState extends State<SearchPage> {
     super.dispose();
   }
 
+  @override
   void initState() {
     //controller.addListener(() {placesSearch();});
-    const refreshRate = const Duration(seconds: 2);
-    timer = Timer.periodic(refreshRate, (Timer t) => placesSearch());
+    //timer = Timer.periodic(refreshRate, (Timer t) => placesSearch());
     super.initState();
   }
 
@@ -111,19 +111,8 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget pageBody(BuildContext context){
-    return Container(
-      decoration: new BoxDecoration(
-        color: Colors.white, 
-          boxShadow: [
-          BoxShadow(
-            color: Colors.grey[400],
-            offset: Offset(1, 1),
-            blurRadius: 5, // has the effect of softening the shadow
-            //spreadRadius: 1, // has the effect of extending the shadow
-          )
-        ],
-        borderRadius: new BorderRadius.all(const Radius.circular(10))
-      ),
+    return Card(
+      elevation: 6,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: CupertinoTextField(

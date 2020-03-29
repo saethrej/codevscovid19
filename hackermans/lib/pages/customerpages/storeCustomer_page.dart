@@ -1,9 +1,8 @@
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hackermans/pages/customerpages/storeCustomerReservation_page.dart';
-import 'package:hackermans/styles.dart';
+import 'package:hackermans/styles/styles.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
 
@@ -120,18 +119,18 @@ class OrdinalSales {
 class StoreCustomerPrediction extends StatelessWidget{
   static List<charts.Series<OrdinalSales, String>> _createSampleData() {
     final data = [
-      new OrdinalSales('17:00', 20),
-      new OrdinalSales('17:30', 20),
-      new OrdinalSales('18:00', 20),
-      new OrdinalSales('18:30', 80),
-      new OrdinalSales('19:00', 70),
-      new OrdinalSales('19:30', 70),
-      new OrdinalSales('20:00', 50),
-      new OrdinalSales('20:30', 10),
+      OrdinalSales('17:00', 20),
+      OrdinalSales('17:30', 20),
+      OrdinalSales('18:00', 20),
+      OrdinalSales('18:30', 80),
+      OrdinalSales('19:00', 70),
+      OrdinalSales('19:30', 70),
+      OrdinalSales('20:00', 50),
+      OrdinalSales('20:30', 10),
     ];
 
     return [
-      new charts.Series<OrdinalSales, String>(
+      charts.Series<OrdinalSales, String>(
         id: 'Sales',
         colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
         domainFn: (OrdinalSales sales, _) => sales.year,

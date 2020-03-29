@@ -87,7 +87,7 @@ class HTTPRequest {
 
     // get store counter in the database
     Future<int> getCounter(int storeID) async {
-      final http.Response response = await http.get(server + '/getcounter/' + storeID.toString(), headers: {"Accept": "application/json"});
+      final http.Response response = await http.get(server + '/getcounter/' + storeID.toString());
       if(response.statusCode == 201){
         return jsonDecode(response.body).people_in_store;
       }
