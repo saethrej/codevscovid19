@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hackermans/pages/scanQRCode_page.dart';
+import 'package:hackermans/pages/ownerpages/scanQRCode_page.dart';
 import 'package:hackermans/styles.dart';
 
 
