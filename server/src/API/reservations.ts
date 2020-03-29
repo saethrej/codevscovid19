@@ -59,22 +59,24 @@ exports.available = function (req: Request, res: Response) {
                 let slots = maxRes
                 let res_time = time
                 reservations.forEach(function (reservation: any) {
-                    if (reservation['reservation_time'] == res_time) {
-                        slots = slots - 1
-                    }
-                    else {
-                        res_time = reservation['reservation_time']
-                        while (time < res_time) {
-                            if (slots > 0) {
-                                open_slots.push({ 'time': time, 'slots': slots })
-                            }
-                            slots = maxRes
-                            time = time + 15
-                            if ((time % 100) >= 60) {
-                                time += 40
-                            }
+                    if (reservation['time'] >= hour_open) {
+                        if (reservation['time'] == res_time) {
+                            slots = slots - 1
                         }
-                        slots = slots - 1
+                        else {
+                            res_time = reservation['time']
+                            while (time < res_time) {
+                                if (slots > 0) {
+                                    open_slots.push({ 'time': time, 'slots': slots })
+                                }
+                                slots = maxRes
+                                time = time + 15
+                                if ((time % 100) >= 60) {
+                                    time += 40
+                                }
+                            }
+                            slots = slots - 1
+                        }
                     }
 
                 })
@@ -143,7 +145,7 @@ exports.reserve = function (req: Request, res: Response) {
  */
 exports.confirm = function (req: Request, res: Response) {
     let code_hash = req.body.code_hash
-    let reservation_id = req.body.reservationId
+    let reservation_id:number = parseInt(req.body.reservationId)
     db_confirmReservation(DB, reservation_id, code_hash, function (result: any) {
         if (result.length != 0) {
             res.end(JSON.stringify({ 'success': true, 'reservationDetails': result }))
