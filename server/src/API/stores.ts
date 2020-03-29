@@ -5,8 +5,16 @@ import { Request, Response } from 'express'
 import {
   db_getStoresInRectangle,
   db_getPeopleInStore,
-  db_getStoreData
+  db_getStoreData,
+  db_getDailyHistory
 } from '../utils/db_ops'
+import { loggers } from 'winston';
+
+function subtractDays(date:Date, days:number) {
+    var result = new Date(date);
+    result.setDate(result.getDate() - days);
+    return result;
+  }
 
 /** brief: returns coordinates and people_in_store of all stores within given area
  * call with POST /getlocations
@@ -54,6 +62,41 @@ exports.dat = function(req: Request, res: Response) {
   let id: number = parseInt(req.params.storeId)
   //end of logic
   db_getStoreData(DB, id, function(result: any) {
-    res.end(JSON.stringify({ success: 'true', storeData: result }))
+    res.end(JSON.stringify({ 'success': true, 'storeData': result }))
   })
 }
+
+exports.customer = function(req: Request, res: Response) {
+    let store_id: number = parseInt(req.params.storeId)
+    let today = new Date()
+    let fin = 7
+    let customers:number[] = new Array(24).fill(0);
+    let i = 0
+    for(i = 0; i < fin; i++){
+        logger.info(i + '')
+        db_getDailyHistory(DB, store_id, subtractDays(today, i + 1).toISOString().slice(0, 10), function(result: any){
+            logger.info(result)
+            if(result.length > 0){
+                logger.info('get nr ' + i + ': ' + result[0]['customers'])
+                for(let j = 0; j < customers.length; j++){
+                    customers[j] += result[0]['customers'][j]
+                }
+            }
+            else{
+                fin = i
+            }
+            logger.info(customers)
+        })
+    }
+    logger.info(customers)
+    while (i < fin){
+        i = i
+        logger.info('waiting in while')
+    }
+    for(let j = 0; j < customers.length; j++){
+        customers[j] = customers[j]/fin
+    }
+    res.end(JSON.stringify({'success': true, 'customers': customers}))
+}
+
+/// store_id, date, customers

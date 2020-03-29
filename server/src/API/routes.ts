@@ -25,6 +25,9 @@ module.exports = function (app: any) {
     app.route('/getStoreData/:storeId')
         .get(stores.dat)
 
+    app.route('/getCustomers/:storeId')
+        .get(stores.customer)
+
     var reservations = require('./reservations')
 
     app.route('/getavailableReservation')
