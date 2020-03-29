@@ -248,7 +248,7 @@ export function db_getStoreData(dbcon: any, store_id: number, callback: any)
 export function db_getStoreReservations(dbcon: any, store_id: number, date: string, callback: any)
 {
     var sql = "SELECT * FROM Reservations2 WHERE store_id = ? AND date = ? \
-                ORDER BY time DESC";
+                ORDER BY time ASC";
     
     dbcon.query(sql, [store_id, date], function(err: any, result: any, fields: any) {
         // if an error occurred, log it and return empty list
@@ -308,11 +308,10 @@ export function db_reserveReservationSlot(dbcon: any, store_id: number, date: st
  * @param callback function from the caller to return result
  * @returns JSON-object containing row of reservation including a slot_id, or [] if error occurred
  */
-export function db_confirmReservation(dbcon: any, reservation_id: string, qr_hash :string, callback: any)
+export function db_confirmReservation(dbcon: any, reservation_id: number, qr_hash :string, callback: any)
 {
     var sql = "UPDATE Reservations2 SET qr_hash = ?, confirmed = 1\
                 WHERE reservation_id = ? \
-                AND qr_hash IS NOT NULL \
                 AND confirmed = 0";
     
     dbcon.query(sql, [qr_hash, reservation_id], function(err: any, result: any, fields: any) {
