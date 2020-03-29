@@ -11,6 +11,10 @@ import 'package:hackermans/styles/waitingScreen.dart';
 
 
 class StoreCustomerPage extends StatefulWidget{
+  int storeId;
+
+  StoreCustomerPage(this.storeId);
+
   @override
   _StoreCustomerPageState createState() => _StoreCustomerPageState();
 }
@@ -20,29 +24,30 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
   Duration refreshRate = Duration(seconds: 1);
   Timer timer;
 
-  bool loading = false;
+  bool loading = true;
   int currentUser;
   int maxUser = 30;
 
   @override
-  void initState() {
+  initState(){
     super.initState();
-    //getStoreInfo(widget.storeId);
-    //timer = Timer.periodic(refreshRate, (Timer t) => getCurrentCount(widget.storeId));
+    getCurrentCount(widget.storeId);
+    //timer = Timer.periodic(refreshRate, (Timer t) => getCurrentCount(storeId));
   }
 
   @override
-  void dispose(){
+  dispose(){
     super.dispose();
-    //timer.cancel();
+    timer.cancel();
+    //getCurrentCount(storeId);
   }
 
-  void getStoreInfo(int storeId) async {
+  void getStoreInformation(int storeId) async {
     print("Get count for store: $storeId");
     await request.getCounter(storeId)
       .then((value) {
         setState(() {
-          // get store information
+          this.currentUser = value;
           loading = false;
         });
       })
@@ -64,6 +69,7 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
         print(e.toString());
     });                       
   }
+
 
   Widget _storeInfoBody(BuildContext context){
     return Padding(
@@ -102,32 +108,29 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
   }
 
   Widget _counterBody(context){
-    return ListView(
-        children: [
-          Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(height: 50),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Center(child: Text(currentUser.toString(), style: Styles.bigInfo,)),
-                Center(child: Text('/${maxUser.toString()}', style: Styles.bigInfo,)),
-              ],
-            ),
-            Center(child: Text('Available entries', style: Styles.text,)),
-            SizedBox(height: 20),
-            _reservationButton(context),
-            SizedBox(height: 50),
-            SizedBox(
-              height: 150,
-              width: MediaQuery.of(context).size.width,
-              child: StoreCustomerPrediction()
-            ),
-            _storeInfoBody(context)
-          ],
-        ),
-      ]
+    return Expanded(
+      child: ListView(
+        children: <Widget>[
+          SizedBox(height: 50),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Center(child: Text(currentUser.toString(), style: Styles.bigInfo,)),
+              Center(child: Text('/${maxUser.toString()}', style: Styles.bigInfo,)),
+            ],
+          ),
+          Center(child: Text('Available entries', style: Styles.text,)),
+          SizedBox(height: 20),
+          _reservationButton(context),
+          SizedBox(height: 50),
+          SizedBox(
+            height: 150,
+            width: MediaQuery.of(context).size.width,
+            child: StoreCustomerPrediction()
+          ),
+          _storeInfoBody(context)
+        ],
+      ),
     );
   }
 

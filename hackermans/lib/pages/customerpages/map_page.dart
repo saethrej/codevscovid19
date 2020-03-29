@@ -70,9 +70,10 @@ class _FullMapState extends State<FullMap> {
           position: city.position,
           icon: BitmapDescriptor.fromBytes(bmp),
           onTap: () {
+            int storeId = 1;
             Navigator.push(
               context, 
-              MaterialPageRoute(builder: (BuildContext context) => StoreCustomerPage())
+              MaterialPageRoute(builder: (BuildContext context) => StoreCustomerPage(storeId))
             );
           }
         )
