@@ -138,6 +138,7 @@ class _SearchPageState extends State<SearchPage> {
           style: Styles.headlineLight,
           onSubmitted: (text) {
             if (text == 'loginStoreUser'){
+              //timer.cancel();
               Navigator.push(
                 context, 
                 MaterialPageRoute(builder: (BuildContext context) => LoginPage())

@@ -1,5 +1,7 @@
 //define database somehow
 
+/*
+
 import { logger } from '../logger'
 import { Request, Response } from 'express'
 import { db_checkReservation, db_makeReservation } from '../utils/db_ops'
@@ -19,3 +21,4 @@ exports.create = function(req: Request, res: Response) {
     res.end(JSON.stringify({ success: result }))
   })
 }
+*/

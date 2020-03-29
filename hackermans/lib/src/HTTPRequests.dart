@@ -22,12 +22,10 @@ class Information{
   }
 }
 
-
-
 class HTTPRequest {
 
   Map coordToID = new Map<int, Information>();
-  String server;
+  String server = 'http://localhost:8000';
   
   //@params tuple of latitude, longitude
   // return a mapping from store ID to its information
@@ -104,7 +102,7 @@ class HTTPRequest {
 
     // get store counter in the database
     Future<int> getCounter(int storeID) async {
-      final http.Response response = await http.get(server + '/getcounter/' + storeID.toString());
+      final http.Response response = await http.get(server + '/getcounter/' + storeID.toString(), headers: {"Accept": "application/json"});
       if(response.statusCode == 201){
         return jsonDecode(response.body).people_in_store;
       }
