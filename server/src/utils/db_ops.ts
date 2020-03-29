@@ -117,8 +117,9 @@ export function db_increase(dbcon: any, store_id: number, callback: any)
         if (result.affectedRows == 1 && result.warningCount == 0) {
 
             // get current date
-            var d = new Date()
-            var date:string = d.toISOString().substr(0, 10)
+            var timezoneOffset = new Date().getTimezoneOffset() * 60000
+            var d = new Date() // current, local timezone
+            var date:string = (new Date(Date.now() - timezoneOffset)).toISOString().substr(0, 10) // also in current time-zone
 
             // check whether an entry in the history database already exists
             dbcon.query("SELECT * FROM History WHERE store_id = ? AND date = ?", [store_id, date], function(err: any, result: any, fields: any) {
@@ -132,7 +133,7 @@ export function db_increase(dbcon: any, store_id: number, callback: any)
                 if (result.length == 0) {
                     // add first customer of the day to the array
                     newArray[d.getHours()] += 1
-                    dbcon.query("INSERT INTO History (store_id, date, customers) VALUES (?, ?, ?)", [store_id, date, JSON.stringify(newArray)], function(err: any, result: any, fields: any) {
+                    dbcon.query("INSERT INTO History (store_id, date, customers) VALUES (?, ?, ?)", [store_id, date, JSON.stringify(newArray)], function(err: any, result: any, fields: any) {ichffasf
                         // if an error occurs here, only log it - we can live with a faulty history DB
                         if (err) {
                             logger.error(err)
