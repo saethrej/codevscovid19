@@ -26,19 +26,23 @@ exports.locations = function(req: Request, res: Response) {
         'left': {'long': left[0], 'lat': left[1]},
         'right': {'long': right[0], 'lat': right[1]},
     }
-    db_getStoresInRectangle(DB, pos, rect, async function(result: any){
+    db_getStoresInRectangle(DB, pos, rect, function(result: any){
         let stores = result
-        await stores.forEach(async function(store:any) {
-            await db_getPeopleInStore(DB, store.store_id, function (result: any) {
+        let counter = stores.length
+        stores.forEach(function(store:any) {
+            db_getPeopleInStore(DB, store.store_id, function (result: any) {
                 store.people_in_store = result
+                counter = counter - 1
+                if (counter <= 0){
+                    let reply = {
+                        'status': 'success',
+                        'stores_n': stores.length,
+                        'stores': stores
+                    }
+                    res.end(JSON.stringify(reply))
+                }
             })
         })
-        let reply = {
-            'status': 'success',
-            'stores_n': stores.length,
-            'stores': stores
-        }
-        res.end(JSON.stringify(reply))
     })
   }
 
