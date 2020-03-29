@@ -4,23 +4,16 @@ import { logger } from '../logger'
 import { Request, Response } from "express"
 import { db_getStoreReservations, db_getStoreData, db_confirmReservation, db_reserveReservationSlot } from '../utils/db_ops'
 
-
-exports.pre = function (req: Request, res: Response) {
-    logger.info('Got a POST preReservation request')
-    //logic
-    res.end(JSON.stringify("['status': 'True']"))
-}
-
 /** brief: returns available reservations
- * call with GET /getavailableReservations/{id}
+ * call with POST /getavailableReservations
  * 
  * @param {Request} req expects storeId:number with store id and date:yyyy-mm-dd with date of interest
- * @param {Response} res contains JSON with field 'success' and 'people_in_store'
+ * @param {Response} res contains JSON with field 'success', 'store_id', 'date' and a list 'reservations'
+ *              with elements {time, slots} representing all available slots
  * @returns -
  */
-
 exports.available = function (req: Request, res: Response) {
-    let store_id = req.body.storeId
+    let store_id:number = parseInt(req.body.storeId)
     let date: string = req.body.date
     var requestdate = new Date(date)
     logger.info(requestdate)
@@ -116,6 +109,15 @@ exports.available = function (req: Request, res: Response) {
     })
 }
 
+/** brief: blocks a reservation and reserve slot for customer
+ * call with POST /reserveReservation
+ * 
+ * @param {Request} req expects storeId:number with store id and date:yyyy-mm-dd with 
+ *          date and time '1200' of reservation that should be blocked
+ * @param {Response} res contains JSON with field 'success' and 'reservationDetails', 
+ *          containing details about reservation including reservation_id
+ * @returns -
+ */
 exports.reserve = function (req: Request, res: Response) {
     let store_id:number = parseInt(req.body.storeId)
     let date = req.body.date
@@ -130,12 +132,18 @@ exports.reserve = function (req: Request, res: Response) {
     })
 }
 
-
+/** brief: confirm reservation for customer
+ * call with POST /confirmReservation
+ * 
+ * @param {Request} req expects code_hash:string with hash of QR-code of res. 
+ *          and reservationId of reservation
+ * @param {Response} res contains JSON with field 'success' and 'reservationDetails', 
+ *          containing details about reservation
+ * @returns -
+ */
 exports.confirm = function (req: Request, res: Response) {
-
     let code_hash = req.body.code_hash
     let reservation_id = req.body.reservationId
-
     db_confirmReservation(DB, reservation_id, code_hash, function (result: any) {
         if (result.length != 0) {
             res.end(JSON.stringify({ 'success': true, 'reservationDetails': result }))

@@ -28,10 +28,10 @@ module.exports = function (app: any) {
     var reservations = require('./reservations')
 
     app.route('/getavailableReservation')
-        .get(reservations.available)
+        .post(reservations.available)
 
     app.route('/reserveReservation')
-        .get(reservations.reserve)
+        .post(reservations.reserve)
     
     app.route('/confirmReservation')
         .post(reservations.confirm)
