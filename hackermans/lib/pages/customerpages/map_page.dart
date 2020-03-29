@@ -120,7 +120,7 @@ class _FullMapState extends State<FullMap> {
   // Example of marker widget
   Widget _getMarkerWidget(String name) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+      padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 3, vertical: 1.5),
         decoration: BoxDecoration(
@@ -129,9 +129,24 @@ class _FullMapState extends State<FullMap> {
           color: Colors.blue,
           shape: BoxShape.rectangle,
         ),
-        child: Text(
-          name,
-          style: TextStyle(fontSize: 14, color: Colors.black),
+        child: Padding(
+          padding: const EdgeInsets.all(1.0),
+          child: SizedBox(
+            height: 60,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'Migros',
+                  style: TextStyle(fontSize: 15, color: Colors.white),
+                ),
+                Text(
+                  '35', 
+                  style: TextStyle(fontSize: 30, color: Colors.white, fontWeight: FontWeight.w800)
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );

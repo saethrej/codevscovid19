@@ -87,8 +87,8 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
+                      Text('Reservations', style: Styles.headerLight,),
                       Text('Migros Rapperswil', style: Styles.header,),
-                      Text('Reservation', style: Styles.headerLight,),
                     ],
                   ),
                 ],

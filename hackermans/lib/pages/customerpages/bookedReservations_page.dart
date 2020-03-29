@@ -79,8 +79,8 @@ class _BookedReservationPageState extends State<BookedReservationPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('Reservations', style: Styles.header,),
                       Text('Booked', style: Styles.headerLight,),
+                      Text('Reservations', style: Styles.header,),
                     ],
                   ),
                 ],
