@@ -20,13 +20,19 @@ class HTTPRequest {
   //@params tuple of latitude, longitude
   // return a mapping from store ID to its information
   Future<List<StoreInformation>> sendCoordinates(Tuple2<double, double> position, Tuple2<double, double> left, Tuple2<double, double> right, Tuple2<double, double> up, Tuple2<double, double> down) async{
-    final uri = Uri.http('10.0.2.2:8000', '/getLocations');
-    var jsonString = json.encode({
-      "position": position.toList(),
-      "up": up.toList(),
-      "down": down.toList(),
-      "right": right.toList(),
-      "left": left.toList()
+    final uri = Uri.http(server, '/getLocations');
+    var a = position.toList();
+    var b = up.toList();
+    var c = down.toList();
+    var d = left.toList();
+    var e = right.toList();
+    var jsonString = 
+    await json.encode({
+      'position': a,
+      'up': b,
+      'down': c,
+     // 'left': d,
+      //'right':e
     });
     print('before');
     final http.Response response = await http.post(uri, headers: <String, String> {
@@ -45,13 +51,14 @@ class HTTPRequest {
       return closeStores;
     }
     else {
+      print(response.statusCode);
       throw Exception("Failed to put current location");
     }
   }
 
     //@TODO Needs header completion
     Future<List<Tuple2<String, int>>> requestTimes(int storeID, String date, String time) async{
-      final uri = Uri.http('10.0.2.2:8000', '/getavailableReservation');
+      final uri = Uri.http(server, '/getavailableReservation');
       var jsonString = json.encode({'storeId': storeID, 'date': date,
       'time': time});
       final http.Response response = await http.post(uri, headers: <String, String> {
