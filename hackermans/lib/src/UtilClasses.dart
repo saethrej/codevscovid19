@@ -33,6 +33,17 @@ class ReservationInformation {
 
 }
 
+class TemporaryReservationObject {
+  int storeID;
+  int reservationID;
+  String date;
+  String time;
+  bool isValid;
+
+  TemporaryReservationObject(this.storeID, this.reservationID,  this.date,  this. time, this.isValid);
+
+}
+
 class PersistenJSONConverter {
 
   static Map<int, ReservationInformation> JSONToMap(String jsonobj){

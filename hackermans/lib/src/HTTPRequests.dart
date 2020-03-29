@@ -9,7 +9,7 @@ import 'UtilClasses.dart';
 class HTTPRequest {
 
   Map coordToID = new Map<int, StoreInformation>();
-  String server = 'http://localhost:8000';
+  static String server = '10.0.2.2:8000';
 
   
   //@params tuple of latitude, longitude
@@ -65,20 +65,25 @@ class HTTPRequest {
 
     // update the store counter in the database
     Future<bool> counterUp(int storeID) async{
-      final http.Response response = await http.get(server + '/counterup/' + storeID.toString());
-      if(response.statusCode == 201){
-        return jsonDecode(response.body).success;
+      final uri = Uri.http('10.0.2.2:8000', '/counterup/' + storeID.toString());
+      final http.Response response = await http.get(uri);
+      if(response.statusCode == 200){
+        print(jsonDecode(response.body)['success']);
+        return jsonDecode(response.body)['success'];
       }
       else {
+        print(response.statusCode);
         throw Exception("Failed to increase counter"); 
       }
     }  
 
     // update the store counter in the database
     Future<bool> counterDown(int storeID) async{
-      final http.Response response = await http.get(server + '/counterdown/' + storeID.toString());
-      if(response.statusCode == 201){
-        return jsonDecode(response.body).success;
+      final uri = Uri.http('10.0.2.2:8000', '/counterdown/' + storeID.toString());
+      final http.Response response = await http.get(uri);//, '/counterdown/' + storeID.toString());
+      if(response.statusCode == 200){
+        print(jsonDecode(response.body)['success']);
+        return jsonDecode(response.body)['success'];
       }
       else {
         throw Exception("Failed to decrease counter"); 
@@ -87,9 +92,11 @@ class HTTPRequest {
 
     // get store counter in the database
     Future<int> getCounter(int storeID) async {
-      final http.Response response = await http.get(server + '/getcounter/' + storeID.toString());
-      if(response.statusCode == 201){
-        return jsonDecode(response.body).people_in_store;
+       final uri = Uri.http('10.0.2.2:8000', '/getcounter/' + storeID.toString());
+      final http.Response response = await http.get(uri, headers: {"Accept": "application/json"});
+      if(response.statusCode == 200){
+        print(jsonDecode(response.body)['people_in_store']);
+        return jsonDecode(response.body)['people_in_store'];
       }
       else {
         throw Exception("Failed to get Counter"); 
@@ -98,14 +105,16 @@ class HTTPRequest {
   
 
   // call after scanning a qr code to check if reservation is valid
-  Future<bool> checkReservationfromQRCode(int storeID, int reservationID, String date, String time) async {
+  Future<bool> checkReservationfromQRCode(int storeID, String reservationID, String date, String time) async {
+    final uri = Uri.http('10.0.2.2:8000', '/checkQRCode');
     var jsonString =  json.encode({'store_id': storeID, 'reservation_id': reservationID, 'date': date,
       'time': time});
-      final http.Response response = await http.post(server + '/checkQRCode', headers: <String, String> {
+      final http.Response response = await http.post(uri, headers: <String, String> {
       'Content-Type': 'application/json' },
       body: jsonString);
-       if(response.statusCode == 201){
-        return jsonDecode(response.body).success;
+       if(response.statusCode == 200){
+         print(jsonDecode(response.body)['success']);
+        return jsonDecode(response.body)['success'];
       }
       else {
         throw Exception("Failed to increase counter"); 
@@ -113,52 +122,45 @@ class HTTPRequest {
 
   }
 
-  /*
-  Future<bool> confirmWithQRHash(int storeID, int hash, String date, String time) async {
-    var jsonString =  json.encode({'store_id': storeID, 'qr_hash': hash, 'date': date,
-    'time': time});
-    final http.Response response = await http.post(server + '/makeReservation', headers: <String, String> {
-    'Content-Type': 'application/json' },
-    body: jsonString);
-      if(response.statusCode == 201){
-      return jsonDecode(response.body).success;
-    }
-    else {
-      throw Exception("Failed send QR code hash"); 
-    }
-
-
-  }
-  */
+ 
 
   // reserve a slot for later reservation on success
-  Future<bool> preReserve(int storeID, int hash, String date, String time) async {
-    var jsonString =  json.encode({'store_id': storeID, 'qr_hash': hash, 'date': date,
+  Future<TemporaryReservationObject> preReserve(int storeID, String date, String time) async {
+    var jsonString =  json.encode({'storeId': storeID, 'date': date,
     'time': time});
-    final http.Response response = await http.post(server + '/preReservation', headers: <String, String> {
+    print(jsonString);
+     final uri = Uri.http('10.0.2.2:8000', '/reserveReservation');
+    final http.Response response = await http.post(uri, headers: <String, String> {
     'Content-Type': 'application/json' },
     body: jsonString);
-      if(response.statusCode == 201){
-      return jsonDecode(response.body).success;
+      if(response.statusCode == 200){
+        print(response.body);
+        var details = jsonDecode(response.body)['reservationDetails'][0];
+        var time = details['time'].toString();
+        TemporaryReservationObject inf = TemporaryReservationObject(storeID, details['reservation_id'], details['date'], details['time'].toString(), jsonDecode(response.body)['success']);
+      return inf;
     }
     else {
+      print(response.statusCode);
       throw Exception("Prereserve"); 
     }
 
   }
 
   // reserve your slot
-  Future<bool> reserve(int storeID, int hash, String date, String time) async{
-     var jsonString =  json.encode({'store_id': storeID, 'qr_hash': hash, 'date': date,
+  Future<bool> reserve(int storeID, int reservationID, String hash, String date, String time) async{
+    var uri = Uri.http(server, '/confirmReservation');
+     var jsonString =  json.encode({'storeId': storeID, 'reservationId': reservationID, 'code_hash': hash,  'date': date,
     'time': time});
-    final http.Response response = await http.post(server + '/getReservation', headers: <String, String> {
+    final http.Response response = await http.post(uri, headers: <String, String> {
     'Content-Type': 'application/json' },
     body: jsonString);
-      if(response.statusCode == 201){
-      return jsonDecode(response.body).success;
+      if(response.statusCode == 200){
+        print(jsonDecode(response.body)['success']);
+      return jsonDecode(response.body)['success'];
     }
     else {
-      throw Exception("Prereserve"); 
+      throw Exception("Reserve"); 
     }
   }
 }
