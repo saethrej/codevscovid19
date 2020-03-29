@@ -85,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             children: <Widget>[
               SizedBox(height: 60,),
-              Text('Sigin', style: Styles.header,),
+              Text('Sign in', style: Styles.header,),
               SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -112,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Text('Sigin'),
+                      child: Text('Sign in'),
                     ),
                   ],
                 ),
