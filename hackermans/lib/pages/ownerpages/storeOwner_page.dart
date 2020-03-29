@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hackermans/pages/ownerpages/scanQRCode_page.dart';
 import 'package:hackermans/src/HTTPRequests.dart';
-import 'package:hackermans/styles.dart';
+import 'package:hackermans/styles/styles.dart';
 
 
 class StorePage extends StatefulWidget{
@@ -11,15 +13,40 @@ class StorePage extends StatefulWidget{
 
 class _StorePageState extends State<StorePage> {
   HTTPRequest request = HTTPRequest();
+  Duration refreshRate = Duration(seconds: 2);
+  Timer timer;
 
   int storeId = 2;
-  int currentUser;
+  int currentUser = 0;
   int maxUser = 50;
-  bool loading = true;
+  bool loading = false;
 
+  @override
   initState(){
     super.initState();
-    getCurrentCount(storeId);
+    //getCurrentCount(storeId);
+    //timer = Timer.periodic(refreshRate, (Timer t) => getCurrentCount(storeId));
+  }
+
+  @override
+  dispose(){
+    super.dispose();
+    timer.cancel();
+    //getCurrentCount(storeId);
+    //timer = Timer.periodic(refreshRate, (Timer t) => getCurrentCount(storeId));
+  }
+
+  void getCurrentCount(int storeId) async {
+    await request.getCounter(storeId)
+      .then((value) {
+        this.currentUser = value;
+        setState(() {
+          loading = false;
+        });
+      })
+      .catchError((e) {
+        print(e.toString());
+    });                       
   }
 
   Widget _scanQRCodeButton(BuildContext context){
@@ -53,26 +80,6 @@ class _StorePageState extends State<StorePage> {
     );
   }
 
-  /*
-  Widget _maintainState(BuildContext context){
-    getCurrentCount(storeId);
-    return Container(height: 0, width: 0);
-  }
-  */
-
-  void getCurrentCount(int storeId) async {
-    await request.getCounter(storeId)
-      .then((value) {
-        this.currentUser = value;
-        setState(() {
-          loading = false;
-        });
-      })
-      .catchError((e) {
-        print(e.toString());
-    });                       
-  }
-
   Widget _counterBody(context){
     return Expanded(
       child: Column(
@@ -89,7 +96,10 @@ class _StorePageState extends State<StorePage> {
                   child: FlatButton(
                     onPressed: (){
                       setState(() {
-                        if (currentUser > 0) currentUser -= 1;
+                        if (currentUser > 0) {
+                          currentUser -= 1;
+                          //request.counterDown(storeId);
+                        }
                       });
                     },                    child: Card(
                       color: !(currentUser == maxUser) ? Colors.grey : Colors.blue,
@@ -101,7 +111,10 @@ class _StorePageState extends State<StorePage> {
                   child: FlatButton(
                     onPressed: (){
                       setState(() {
-                        if (currentUser < maxUser) currentUser += 1;
+                        if (currentUser < maxUser) {
+                          currentUser += 1;
+                          //request.counterUp(storeId);
+                        }
                       });
                     },
                     child: Card(
