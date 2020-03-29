@@ -1,12 +1,16 @@
 //define database somehow
 
 import { logger } from '../logger'
-import {Request, Response} from "express"
-import { db_getStoresInRectangle, db_getPeopleInStore, db_getStoreData} from '../utils/db_ops'
+import { Request, Response } from 'express'
+import {
+  db_getStoresInRectangle,
+  db_getPeopleInStore,
+  db_getStoreData
+} from '../utils/db_ops'
 
 /** brief: returns coordinates and people_in_store of all stores within given area
  * call with POST /getlocations
- * 
+ *
  * @param {Request} req expects body with JSON containing elements with array of two doubles
  *          called position, up, down, right, left
  * @param {Response} res contains JSON with fields 'success', 'stores_n' and 'stores' which is
@@ -44,20 +48,12 @@ exports.locations = function(req: Request, res: Response) {
             })
         })
     })
-  }
+}
 
-/** brief: returns all information for store with given storeId
- * call with POST /getlocations
- * 
- * @param {Request} req req expects storeId:number with store id
- * @param {Response} res contains JSON with fields 'success' and 'storeData' which is
- *          a dict information available about the store
- * @returns -
- */
 exports.dat = function(req: Request, res: Response) {
-    let id: number = parseInt(req.params.storeId)
-    //end of logic
-    db_getStoreData(DB, id, function(result: any){
-        res.end(JSON.stringify({'success': 'true', 'storeData': result}))
-    })
+  let id: number = parseInt(req.params.storeId)
+  //end of logic
+  db_getStoreData(DB, id, function(result: any) {
+    res.end(JSON.stringify({ success: 'true', storeData: result }))
+  })
 }

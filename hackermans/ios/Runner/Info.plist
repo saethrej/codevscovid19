@@ -49,5 +49,10 @@
 	<string>Shows your location on the map and helps improve the map.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Needed to scan QR codes of reservations</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+			<true/>
+	</dict>  
 </dict>
 </plist>
