@@ -42,18 +42,18 @@ class HTTPRequest {
   }
 
     //@TODO Needs header completion
-    Future<List<String>> requestTimes(int id, String date, String time) async{
+    Future<List<Tuple2<String, int>>> requestTimes(int id, String date, String time) async{
       var jsonString = json.encode({'store_id': id, 'date': date,
       'time': time});
-      final http.Response response = await http.post(server, headers: <String, String> {
+      final http.Response response = await http.post(server + '/getavailableReservation', headers: <String, String> {
       'Content-Type': 'application/json' },
       body: jsonString);
 
-      List<String> times = List();
+      List<Tuple2<String, int>>  times = List<Tuple2<String, int>> ();
       if(response.statusCode == 201){
-        var timesNoFormat = jsonDecode(response.body)['times'];
+        var timesNoFormat = jsonDecode(response.body)['reservations'];
         for(var i = 0; i<timesNoFormat.length; i++){
-          times.add(timesNoFormat[i].time);
+          times.add(Tuple2(timesNoFormat[i].time, timesNoFormat[i].slots));
         }
         return times;
       }
