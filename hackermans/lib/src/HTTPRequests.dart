@@ -10,14 +10,14 @@ class Information{
   double numPeople;
   int id;
 
-  Information({this.numPeople, id, this.longitude, this.latitude});
+  Information({this.longitude, this.latitude, this.numPeople, this.id});
 
   factory Information.fromJson(Map<String, dynamic> json){
     return Information(
-      numPeople: json['people_in_store'],
-      id: json['id'],
       longitude: json['longitude'],
-      latitude: json['latitude']
+      latitude: json['latitude'],
+        numPeople: json['people_in_store'],
+      id: json['id'],
     );
   }
 }
