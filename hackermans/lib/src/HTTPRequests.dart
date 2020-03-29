@@ -4,32 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:tuple/tuple.dart';
 
-class Information{
-  double longitude;
-  double latitude;
-  double numPeople;
-  int id;
-
-  Information({this.longitude, this.latitude, this.numPeople, this.id});
-
-  factory Information.fromJson(Map<String, dynamic> json){
-    return Information(
-      longitude: json['longitude'],
-      latitude: json['latitude'],
-        numPeople: json['people_in_store'],
-      id: json['id'],
-    );
-  }
-}
+import 'UtilClasses.dart';
 
 class HTTPRequest {
 
-  Map coordToID = new Map<int, Information>();
+  Map coordToID = new Map<int, StoreInformation>();
   String server = 'http://localhost:8000';
+
   
   //@params tuple of latitude, longitude
   // return a mapping from store ID to its information
-  Future<Map<int, Information>> sendCoordinates(Tuple2<double, double> position, Tuple2<double, double> left, Tuple2<double, double> right, Tuple2<double, double> up, Tuple2<double, double> down) async{
+  Future<Map<int, StoreInformation>> sendCoordinates(Tuple2<double, double> position, Tuple2<double, double> left, Tuple2<double, double> right, Tuple2<double, double> up, Tuple2<double, double> down) async{
     var jsonString = json.encode({
       "position": position,
       "up": up,
@@ -45,7 +30,7 @@ class HTTPRequest {
     if(response.statusCode == 201){
       var stores = jsonDecode(response.body)['stores'];
       for(var i =0; i<stores.length; i++){
-        var inf = Information.fromJson(json.decode(stores[i]));
+        var inf = StoreInformation.fromJson(json.decode(stores[i]));
         coordToID.putIfAbsent(inf.id, ()=> inf);
       }
       return coordToID;
@@ -56,18 +41,18 @@ class HTTPRequest {
   }
 
     //@TODO Needs header completion
-    Future<List<String>> requestTimes(int id, String date, String time) async{
+    Future<List<Tuple2<String, int>>> requestTimes(int id, String date, String time) async{
       var jsonString = json.encode({'store_id': id, 'date': date,
       'time': time});
-      final http.Response response = await http.post(server, headers: <String, String> {
+      final http.Response response = await http.post(server + '/getavailableReservation', headers: <String, String> {
       'Content-Type': 'application/json' },
       body: jsonString);
 
-      List<String> times = List();
+      List<Tuple2<String, int>>  times = List<Tuple2<String, int>> ();
       if(response.statusCode == 201){
-        var timesNoFormat = jsonDecode(response.body)['times'];
+        var timesNoFormat = jsonDecode(response.body)['reservations'];
         for(var i = 0; i<timesNoFormat.length; i++){
-          times.add(timesNoFormat[i].time);
+          times.add(Tuple2(timesNoFormat[i].time, timesNoFormat[i].slots));
         }
         return times;
       }
@@ -176,7 +161,4 @@ class HTTPRequest {
       throw Exception("Prereserve"); 
     }
   }
-
-
-
 }

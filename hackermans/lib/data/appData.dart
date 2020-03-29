@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hackermans/src/UtilClasses.dart';
 
 
 class AppData with ChangeNotifier{
@@ -10,7 +11,7 @@ class AppData with ChangeNotifier{
   bool setCameraUpdate = false;
 
   // TODO: List of QR code object
-  List<int> listQRCode = List<int>();
+  Map <String, ReservationInformation> QRCodeMap = Map <String, ReservationInformation>();
 
   int setID(int storeID) {
     this.storeID = storeID;

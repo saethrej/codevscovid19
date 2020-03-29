@@ -96,7 +96,7 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               SizedBox(height: 60),
               _searchButton(context),
-              (!appData.listQRCode.isEmpty) ? Container(height: 0, width: 0) : _bookedReservationsButton(context),
+              (!appData.QRCodeMap.isEmpty) ? Container(height: 0, width: 0) : _bookedReservationsButton(context),
               Spacer()
             ]
           )
