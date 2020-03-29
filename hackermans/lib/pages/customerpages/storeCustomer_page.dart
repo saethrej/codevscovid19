@@ -31,7 +31,7 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
   @override
   initState(){
     super.initState();
-    getCurrentCount(widget.storeId);
+    //getStoreInformation(widget.storeId);
     //timer = Timer.periodic(refreshRate, (Timer t) => getCurrentCount(storeId));
   }
 
