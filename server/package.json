@@ -30,6 +30,7 @@
     "typescript": "^3.7.5"
   },
   "dependencies": {
+    "@types/mysql": "^2.15.9",
     "body-parser": "^1.19.0",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.11.0",
