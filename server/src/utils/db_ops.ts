@@ -1,4 +1,4 @@
-import { stream } from 'winston'
+import { stream } from "winston"
 import { logger } from '../logger'
 
 /* Project: CodeVsCovid-19
@@ -10,8 +10,9 @@ import { logger } from '../logger'
 // we require the mysql library
 const mysql = require('mysql')
 
-/** brief: initiates a database connection and returns connection object
- *
+
+/** brief: initiates a database connection and returns connection object 
+ * 
  * @returns connection object
 */
 export function db_connect() 
@@ -26,20 +27,21 @@ export function db_connect()
     connection.connect((err: any) => {
         if (err) throw err
     })
-    logger.info("Successfully connected to database.");
+    logger.info("Successfully connected to database.")
     return connection
 }
 
 /** brief: disconnects the server from the database
- *
+ * 
  * @param {*} dbcon the database connection
  */
-function db_disconnect(dbcon: any) {
-  dbcon.end()
+function db_disconnect(dbcon: any)
+{
+    dbcon.end()
 }
 
 /** brief: returns the number of stores in the database
- *
+ * 
  * @param {*} dbcon the database connection
  * @param {*} callback function from the caller to return result
  * @returns {number} number of stores in database
@@ -57,133 +59,116 @@ export function db_getNumStores(dbcon: any, callback: any)
 
 /** brief: returns a list of stores (store_id, long, lat) within a certain radius
  *         of the current position
- *
+ * 
  * @param {MySQL connection} dbcon the database connection
  * @param {*} pos the target location (long, lat)
  * @param {number} radius the radius to search for stores in [km]
  * @param {callback fn} callback function from the caller to return result
  * @returns JSON-object containing rows of the form {store_id, longitude, latitude}
  */
-export function db_getStoresWithinRadius(
-  dbcon: any,
-  pos: any,
-  radius: number,
-  callback: any
-) {
-  // todo: compute the deviation in longitude and latitude at the current position that corresponds
-  //       to
-  var sql =
-    'SELECT store_id, longitude, latitude \
+export function db_getStoresWithinRadius(dbcon: any, pos: any, radius: number, callback: any)
+{
+    // todo: compute the deviation in longitude and latitude at the current position that corresponds
+    //       to 
+    var sql = "SELECT store_id, longitude, latitude \
                FROM Stores \
-               WHERE '
+               WHERE "
 }
 
 /** brief: returns a list of stores (store_id, long, lat) that are currently visible on the map
- *
+ * 
  * @param dbcon the database connection
  * @param pos JSON-object {long, lat}
  * @param rect JSON-object with 4 rows {up: {long, lat}, down ...}
  * @param callback function from the caller to return result
- * @returns JSON-object containing rows of the form {store_id, longitude, latitude}
+ * @returns JSON-object containing rows of the form {store_id, longitude, latitude} 
  */
-export function db_getStoresInRectangle(
-  dbcon: any,
-  pos: any,
-  rect: any,
-  callback: any
-) {
-  var sql =
-    'SELECT store_id, longitude, latitude FROM Stores \
-               WHERE longitude > ? AND longitude < ? AND latitude > ? AND latitude < ?'
-  dbcon.query(
-    sql,
-    [rect.left.long, rect.right.long, rect.down.lat, rect.up.lat],
-    function(err: any, result: any, fields: any) {
-      if (err) throw err
-      callback(result)
-    }
-  )
+export function db_getStoresInRectangle(dbcon: any, pos: any, rect: any, callback: any)
+{
+    var sql = "SELECT store_id, longitude, latitude FROM Stores \
+               WHERE longitude > ? AND longitude < ? AND latitude > ? AND latitude < ?"
+    dbcon.query(sql, [rect.left.long, rect.right.long, rect.down.lat, rect.up.lat], function(err: any, result: any, fields: any) {
+        if (err) throw err
+        callback(result)
+    })
 }
 
 /** brief: attempts to increment the store counter
- *
+ * 
  * @param {*} dbcon the database connection
  * @param {*} store_id the unique id of the store
  * @param {callback fn} callback function from the caller to return result
  * @returns true if successful, false otherwise
  */
-export function db_increase(dbcon: any, store_id: number, callback: any) {
-  var sql =
-    'UPDATE Stores SET people_in_store = people_in_store + 1 \
-                 WHERE store_id = ?'
-  dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
-    if (err) {
-      logger.error(err)
-      callback(false)
-      return
-    }
-    // check whether the update was successful or not
-    if (result.affectedRows == 1 && result.warningCount == 0) {
-      callback(true)
-    } else {
-      callback(false)
-    }
-  })
+export function db_increase(dbcon: any, store_id: number, callback: any)
+{
+    var sql = "UPDATE Stores SET people_in_store = people_in_store + 1 \
+                 WHERE store_id = ?"
+    dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
+        if (err) {
+            logger.error(err)
+            callback(false)
+            return
+        }
+        // check whether the update was successful or not
+        if (result.affectedRows == 1 && result.warningCount == 0) {
+            callback(true)
+        } else {
+            callback(false)
+        }
+    })
 }
 
 /** brief: attempts to decrement the store counter
- *
- * @param {*} dbcon the database connection
+ * 
+ * @param {*} dbcon the database connection 
  * @param store_id the unique id of the store
  * @param callback function from the caller to return result
  * @returns true if successful, false otherwise
  */
-export function db_decrease(dbcon: any, store_id: number, callback: any) {
-  var sql =
-    'UPDATE Stores SET people_in_store = people_in_store - 1 \
-                 WHERE store_id = ?'
-  dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
-    if (err) {
-      logger.error(err)
-      callback(false)
-      return
-    }
-    // check whether the update was successful or not
-    if (result.affectedRows == 1 && result.warningCount == 0) {
-      callback(true)
-    } else {
-      callback(false)
-    }
-  })
+export function db_decrease(dbcon: any, store_id: number, callback: any)
+{
+    var sql = "UPDATE Stores SET people_in_store = people_in_store - 1 \
+                 WHERE store_id = ?"
+    dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
+        if (err) {
+            logger.error(err)
+            callback(false)
+            return
+        }
+        // check whether the update was successful or not
+        if (result.affectedRows == 1 && result.warningCount == 0) {
+            callback(true)
+        } else {
+            callback(false)
+        }
+    })
 }
 
 /** brief: returns the current number of people in the store
- *
- * @param dbcon the database connection
+ * 
+ * @param dbcon the database connection 
  * @param store_id id of the store
- * @param callback function from the caller to return result
+ * @param callback function from the caller to return result 
  * @returns {number} amount of people in corresponding store
- *
- * @throws exception if the query fails
+ * 
+ * @throws exception if the query fails 
  */
-export function db_getPeopleInStore(
-  dbcon: any,
-  store_id: number,
-  callback: any
-) {
-  var sql = 'SELECT people_in_store FROM Stores WHERE store_id = ?'
-  dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
-    if (err) {
-      logger.error(err)
-      throw err // throw error
-    }
-    callback(result[0]['people_in_store'])
-  })
+export function db_getPeopleInStore(dbcon: any, store_id: number, callback: any)
+{
+    var sql = "SELECT people_in_store FROM Stores WHERE store_id = ?"
+    dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
+        if (err) {
+            logger.error(err)
+            throw err // throw error
+        }
+        callback(result[0]['people_in_store'])
+    })
 }
 
 /** brief: checks whether a reservation is valid for the current time or not.
  *         the method allows a flexibility of +/- 10 minutes
- *
+ * 
  * @param dbcon the database connection
  * @param store_id id of the store
  * @param reservation_id id of the reservation (hash)
@@ -193,21 +178,21 @@ export function db_getPeopleInStore(
 export function db_checkReservation(dbcon: any, store_id: number, qr_hash: any, callback: any)
 {
     // get current time and tolerance times
-    var msSinceEpoch = Date.now();
-    var upTolDate = new Date(msSinceEpoch + 600000);
-    var loTolDate = new Date(msSinceEpoch - 600000);
-    var upMin = upTolDate.getMinutes() < 10 ? "0" + upTolDate.getMinutes() : upTolDate.getMinutes();
-    var loMin = loTolDate.getMinutes() < 10 ? "0" + loTolDate.getMinutes() : loTolDate.getMinutes();
+    var msSinceEpoch = Date.now()
+    var upTolDate = new Date(msSinceEpoch + 600000)
+    var loTolDate = new Date(msSinceEpoch - 600000)
+    var upMin = upTolDate.getMinutes() < 10 ? "0" + upTolDate.getMinutes() : upTolDate.getMinutes()
+    var loMin = loTolDate.getMinutes() < 10 ? "0" + loTolDate.getMinutes() : loTolDate.getMinutes()
 
-    var upTime = "" + upTolDate.getHours() + upMin;
-    var loTime = "" + loTolDate.getHours() + loMin;
+    var upTime = "" + upTolDate.getHours() + upMin
+    var loTime = "" + loTolDate.getHours() + loMin
 
     var sql = "SELECT * FROM Reservations2 \
                 WHERE store_id = ? \
                 AND qr_hash = ? \
                 AND date = CURDATE() \
                 AND time > ? \
-                AND time < ?";
+                AND time < ?"
 
     dbcon.query(sql, [store_id, qr_hash, loTime, upTime], function(err: any, result: any, fields: any) {
         // return false in case an error occurred
@@ -227,29 +212,29 @@ export function db_checkReservation(dbcon: any, store_id: number, qr_hash: any, 
 }
 
 /** brief: returns the store data, i.e. its information and opening hours
- *
+ * 
  * @param dbcon the database connection
  * @param store_id id of the store
  * @param callback function from the caller to return result
  * @returns list containing 1 row of the form {Stores joined with OpeningHours}
- *
+ * 
  * @throws exception if sql query fails
  */
-export function db_getStoreData(dbcon: any, store_id: number, callback: any) {
-  var sql =
-    'SELECT * FROM Stores, Opening_Hours \
+export function db_getStoreData(dbcon: any, store_id: number, callback: any)
+{
+    var sql = "SELECT * FROM Stores, Opening_Hours \
                 WHERE Stores.store_id = ? \
-                AND Stores.store_id = Opening_Hours.store_id'
-
-  dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
-    // return false in case an error occurred
-    if (err) {
-      logger.error(err)
-      throw err
-    }
-    // return the result of the query
-    callback(result)
-  })
+                AND Stores.store_id = Opening_Hours.store_id"
+    
+    dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
+        // return false in case an error occurred
+        if (err) {
+            logger.error(err)
+            throw err
+        }
+        // return the result of the query
+        callback(result)
+    })
 }
 
 /** brief: returns a list of reservations at a given store on a given date
@@ -263,17 +248,17 @@ export function db_getStoreData(dbcon: any, store_id: number, callback: any) {
 export function db_getStoreReservations(dbcon: any, store_id: number, date: string, callback: any)
 {
     var sql = "SELECT * FROM Reservations2 WHERE store_id = ? AND date = ? \
-                ORDER BY time ASC";
+                ORDER BY time ASC"
     
     dbcon.query(sql, [store_id, date], function(err: any, result: any, fields: any) {
         // if an error occurred, log it and return empty list
         if (err) {
-            logger.error(err);
-            callback([]);
-            return;
+            logger.error(err)
+            callback([])
+            return
         }
         // otherwise, return the list
-        callback(result);
+        callback(result)
     })
 }
 
@@ -289,12 +274,12 @@ export function db_getStoreReservations(dbcon: any, store_id: number, date: stri
 export function db_reserveReservationSlot(dbcon: any, store_id: number, date: string, time: number, callback: any)
 {
     var sql = "INSERT INTO Reservations2 (store_id, date, time, confirmed) \
-                VALUES (?, ?, ?, 0)";
+                VALUES (?, ?, ?, 0)"
 
     dbcon.query(sql, [store_id, date, time], function(err: any, result: any, fields: any) {
         if (err) {
-            logger.error(err);
-            callback([]);
+            logger.error(err)
+            callback([])
         }
         // check that only one row was inserted
         if (result.affectedRows == 1) {
@@ -302,17 +287,16 @@ export function db_reserveReservationSlot(dbcon: any, store_id: number, date: st
             dbcon.query("SELECT * FROM Reservations2 WHERE reservation_id = ?", [result.insertId], function(err: any, result: any, fields: any) {
                 // return an empty list if an error occurred in the second query
                 if (err) {
-                    logger.error(err);
-                    callback([]);
+                    logger.error(err)
+                    callback([])
                 }
-                callback(result);
+                callback(result)
             })
         } else {
-            callback([]);
+            callback([])
         }
     })
 }
-
 
 /** brief: confirm a reservation for given slot_id.
  * 
@@ -327,14 +311,14 @@ export function db_confirmReservation(dbcon: any, reservation_id: number, qr_has
 {
     var sql = "UPDATE Reservations2 SET qr_hash = ?, confirmed = 1\
                 WHERE reservation_id = ? \
-                AND confirmed = 0";
+                AND confirmed = 0"
     
     dbcon.query(sql, [qr_hash, reservation_id], function(err: any, result: any, fields: any) {
         // when an error occurs, return empty list
         if (err) {
-            logger.error(err);
-            callback([]);
-            return;
+            logger.error(err)
+            callback([])
+            return
         }
         // check if it only affected one row
         if (result.affectedRows == 1) {
@@ -342,14 +326,42 @@ export function db_confirmReservation(dbcon: any, reservation_id: number, qr_has
             dbcon.query("SELECT * FROM Reservations2 WHERE reservation_id = ?", [reservation_id], function(err: any, result: any, fields: any) {
                 // return an empty list if an error occurred in the second query
                 if (err) {
-                    logger.error(err);
-                    callback([]);
+                    logger.error(err)
+                    callback([])
                 }
-                callback(result);
+                callback(result)
             })
-        } else{
-            callback([]); // return empty array
+        } else {
+            callback([]) // return empty array
         }
     })
 }
 
+/** brief: checks whether a user's claimed credentials exist in the databse, returns true if that's the case and false otherwise
+ * 
+ * @param dbcon the database connection
+ * @param {number} store_id the id of the store where the user (i.e. security personnel) logs in from
+ * @param {string} username the (unique) username that the user provides
+ * @param {string} pw_hash hash(password) or hash(username||password) 
+ * @param callback function from the caller to return result
+ * @returns {boolean} true if credentials are valid for given store, false otherwise
+ */
+export function db_checkCredentials(dbcon: any, store_id: number, username: string, pw_hash: string, callback: any)
+{
+    var sql = "SELECT * FROM Credentials WHERE store_id = ? AND username = ? AND hash = ?"
+
+    dbcon.query(sql, [store_id, username, pw_hash], function(err: any, result: any, fields: any) {
+        // if an error occurs, log it and return false
+        if (err) {
+            logger.error(err)
+            callback(false)
+            return
+        }
+        // check if exactly one such entry exists
+        if (result.length == 1) {
+            callback(true)
+        } else {
+            callback(false)
+        }
+    })
+}

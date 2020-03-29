@@ -35,4 +35,7 @@ module.exports = function (app: any) {
     
     app.route('/confirmReservation')
         .post(reservations.confirm)
+
+    app.route('/getnextReservation/:storeId')
+        .get(reservations.next)
 }
