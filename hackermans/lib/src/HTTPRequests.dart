@@ -26,13 +26,13 @@ class HTTPRequest {
     var c = down.toList();
     var d = left.toList();
     var e = right.toList();
-    var jsonString = 
-    await json.encode({
+    var jsonString =
+    json.encode({
       'position': a,
       'up': b,
       'down': c,
-     // 'left': d,
-      //'right':e
+      'left': d,
+     'right':e
     });
     print('before');
     final http.Response response = await http.post(uri, headers: <String, String> {
@@ -43,11 +43,11 @@ class HTTPRequest {
     if(response.statusCode == 200){
        List closeStores = List<StoreInformation>();
       var stores = jsonDecode(response.body)['stores'];
+      print(stores);
       for(var i =0; i<stores.length; i++){
-        var inf = StoreInformation.fromJson(json.decode(stores[i]));
+        var inf = StoreInformation.fromJson(stores[i]);
         closeStores.add(inf);
       }
-      print(closeStores);
       return closeStores;
     }
     else {
@@ -57,17 +57,19 @@ class HTTPRequest {
   }
 
     //@TODO Needs header completion
-    Future<List<Tuple2<String, int>>> requestTimes(int storeID, String date, String time) async{
+    Future<List<Tuple2<String, int>>> requestTimes(int storeID, String date) async{
       final uri = Uri.http(server, '/getavailableReservation');
-      var jsonString = json.encode({'storeId': storeID, 'date': date,
-      'time': time});
+      var jsonString = json.encode({'storeId': storeID, 'date': date});
       final http.Response response = await http.post(uri, headers: <String, String> {
       'Content-Type': 'application/json' },
       body: jsonString);
       List<Tuple2<String, int>>  times = List<Tuple2<String, int>> ();
       if(response.statusCode == 200){
         var timesNoFormat = jsonDecode(response.body)['reservations'];
-        //print(timesNoFormat);
+        if(times == null){
+          return null;
+        }
+        print(timesNoFormat);
         for(var i = 0; i<timesNoFormat.length; i++){
           times.add(Tuple2(timesNoFormat[i]['time'].toString(), timesNoFormat[i]['slots']));
         }
