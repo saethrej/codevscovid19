@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hackermans/pages/ownerpages/storeOwner_page.dart';
 
-import '../../styles.dart';
+import 'package:hackermans/styles/styles.dart';
 
 
 
@@ -38,36 +38,42 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          TextFormField(
-            controller: _controllerUsername,
-            autofocus: true,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Username',
-              labelStyle: Styles.text
+          Card(
+            elevation: 5,
+            child: TextFormField(
+              controller: _controllerUsername,
+              autofocus: true,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Username',
+                labelStyle: Styles.text
+              ),
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Enter username';
+                }
+                return null;
+              },
             ),
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'Enter username';
-              }
-              return null;
-            },
           ),
           SizedBox(height: 30),
-          TextFormField(
-            controller: _controllerPassword,
-            obscureText: true,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Password',
-              labelStyle: Styles.text
+          Card(
+            elevation: 2,
+            child: TextFormField(
+              controller: _controllerPassword,
+              obscureText: true,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Password',
+                labelStyle: Styles.text
+              ),
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Enter password';
+                }
+                return null;
+              },
             ),
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'Enter password';
-              }
-              return null;
-            },
           ),
         ],
       ),

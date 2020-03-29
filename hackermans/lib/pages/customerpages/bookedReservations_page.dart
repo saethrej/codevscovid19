@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hackermans/pages/ownerpages/scanQRCode_page.dart';
-import 'package:hackermans/styles.dart';
+import 'package:hackermans/styles/styles.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+
 
 
 class BookedReservationPage extends StatefulWidget{
@@ -10,6 +12,24 @@ class BookedReservationPage extends StatefulWidget{
 }
 
 class _BookedReservationPageState extends State<BookedReservationPage> {
+
+
+  Widget _buildQRCode(BuildContext context){
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Expanded(
+        child: Container(
+          height: 200,
+          width: 200,
+          child: QrImage(
+            data: "1234567890",
+            version: QrVersions.auto,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _pageBody(BuildContext context){
     return Expanded(
       child: PageView.builder(
@@ -32,16 +52,7 @@ class _BookedReservationPageState extends State<BookedReservationPage> {
                       ],
                     ),
                     Text('17:00', style: Styles.headerLight),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Expanded(
-                        child: Container(
-                          height: 200,
-                          width: 200,
-                          color: Colors.black
-                        ),
-                      ),
-                    )
+                    _buildQRCode(context)
                   ],
                 ),
               )
@@ -68,8 +79,8 @@ class _BookedReservationPageState extends State<BookedReservationPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('Reservations', style: Styles.header,),
                       Text('Booked', style: Styles.headerLight,),
+                      Text('Reservations', style: Styles.header,),
                     ],
                   ),
                 ],

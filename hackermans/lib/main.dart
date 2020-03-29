@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:hackermans/pages/customerpages/bookedReservations_page.dart';
 import 'package:hackermans/pages/customerpages/map_page.dart';
 import 'package:hackermans/pages/customerpages/search_page.dart';
-import 'package:hackermans/styles.dart';
+import 'package:hackermans/styles/styles.dart';
 import 'package:provider/provider.dart';
 
 import 'data/appData.dart';

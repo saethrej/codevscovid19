@@ -1,7 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hackermans/data/appData.dart';
 import 'package:hackermans/pages/ownerpages/scanQRCode_page.dart';
-import 'package:hackermans/styles.dart';
+import 'package:hackermans/src/HTTPRequests.dart';
+import 'package:hackermans/styles/styles.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 
@@ -82,8 +87,8 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
+                      Text('Reservations', style: Styles.headerLight,),
                       Text('Migros Rapperswil', style: Styles.header,),
-                      Text('Reservation', style: Styles.headerLight,),
                     ],
                   ),
                 ],
@@ -105,6 +110,12 @@ class CalendarBody extends StatefulWidget{
 
 class _CalendarBodyState extends State<CalendarBody> {
   CalendarController _calendarController;
+  HTTPRequest request = HTTPRequest();
+  Duration refreshRate = Duration(seconds: 2);
+  Timer timer;
+
+  int storeId;
+  // TODO: insert list for returned reservation slots
 
   @override
   void initState() {
@@ -118,9 +129,29 @@ class _CalendarBodyState extends State<CalendarBody> {
     super.dispose();
   }
 
+  // get available slots based on slected date
+  void _getAvailableSlots({String date}){
+    // list = request.getAvailableSlots(storeId, date)
+  }
+
+  void _bookSlot(int storeId, String date, String time ){
+    // bool = request.bookSlot(storeId, date, time)
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    //TODO: Set to todays day and set controller to week
+    final appData = Provider.of<AppData>(context);
+    this.storeId = appData.storeID;
+
+    Function(DateTime, DateTime, CalendarFormat) onCalendarCreated = (DateTime day, DateTime endDay, CalendarFormat format){
+      _getAvailableSlots(date: day.toString().substring(0, 10));
+    };
+
+    Function(DateTime, List) onDaySelected = (DateTime day, List events) {
+      _getAvailableSlots(date: day.toString().substring(0, 10));
+    };
+
     return TableCalendar(
       calendarController: _calendarController,
       initialCalendarFormat: CalendarFormat.week,
@@ -129,6 +160,9 @@ class _CalendarBodyState extends State<CalendarBody> {
         todayColor: Colors.grey,
       ),
       startingDayOfWeek: StartingDayOfWeek.saturday, 
+      endDay: DateTime(2020, 13, 14),
+      onCalendarCreated: onCalendarCreated,
+      onDaySelected: onDaySelected,
     );
   }
 }

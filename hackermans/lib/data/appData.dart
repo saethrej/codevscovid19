@@ -13,7 +13,7 @@ class AppData with ChangeNotifier{
   // TODO: List of QR code object
   Map <String, ReservationInformation> QRCodeMap = Map <String, ReservationInformation>();
 
-  int setID(int storeID) {
+  void setID(int storeID) {
     this.storeID = storeID;
     notifyListeners();
   }
