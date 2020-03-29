@@ -7,33 +7,42 @@ import 'package:tuple/tuple.dart';
 import 'UtilClasses.dart';
 
 class HTTPRequest {
-
-  Map coordToID = new Map<int, StoreInformation>();
+  
+  HTTPRequest._privateConstructor(){
+  }
+  static final HTTPRequest instance = HTTPRequest._privateConstructor();
   static String server = '10.0.2.2:8000';
 
+  factory HTTPRequest(){
+    return instance;
+  }
   
   //@params tuple of latitude, longitude
   // return a mapping from store ID to its information
-  Future<Map<int, StoreInformation>> sendCoordinates(Tuple2<double, double> position, Tuple2<double, double> left, Tuple2<double, double> right, Tuple2<double, double> up, Tuple2<double, double> down) async{
+  Future<List<StoreInformation>> sendCoordinates(Tuple2<double, double> position, Tuple2<double, double> left, Tuple2<double, double> right, Tuple2<double, double> up, Tuple2<double, double> down) async{
+    final uri = Uri.http('10.0.2.2:8000', '/getLocations');
     var jsonString = json.encode({
-      "position": position,
-      "up": up,
-      "down": down,
-      "right": right,
-      "left": left
+      "position": position.toList(),
+      "up": up.toList(),
+      "down": down.toList(),
+      "right": right.toList(),
+      "left": left.toList()
     });
-    final http.Response response = await http.post(server + '/getlocations', headers: <String, String> {
+    print('before');
+    final http.Response response = await http.post(uri, headers: <String, String> {
       'Content-Type': 'application/json' },
       body: jsonString
     );
-
-    if(response.statusCode == 201){
+    print('after');
+    if(response.statusCode == 200){
+       List closeStores = List<StoreInformation>();
       var stores = jsonDecode(response.body)['stores'];
       for(var i =0; i<stores.length; i++){
         var inf = StoreInformation.fromJson(json.decode(stores[i]));
-        coordToID.putIfAbsent(inf.id, ()=> inf);
+        closeStores.add(inf);
       }
-      return coordToID;
+      print(closeStores);
+      return closeStores;
     }
     else {
       throw Exception("Failed to put current location");
@@ -41,23 +50,25 @@ class HTTPRequest {
   }
 
     //@TODO Needs header completion
-    Future<List<Tuple2<String, int>>> requestTimes(int id, String date, String time) async{
-      var jsonString = json.encode({'store_id': id, 'date': date,
+    Future<List<Tuple2<String, int>>> requestTimes(int storeID, String date, String time) async{
+      final uri = Uri.http('10.0.2.2:8000', '/getavailableReservation');
+      var jsonString = json.encode({'storeId': storeID, 'date': date,
       'time': time});
-      final http.Response response = await http.post(server + '/getavailableReservation', headers: <String, String> {
+      final http.Response response = await http.post(uri, headers: <String, String> {
       'Content-Type': 'application/json' },
       body: jsonString);
-
       List<Tuple2<String, int>>  times = List<Tuple2<String, int>> ();
-      if(response.statusCode == 201){
+      if(response.statusCode == 200){
         var timesNoFormat = jsonDecode(response.body)['reservations'];
+        //print(timesNoFormat);
         for(var i = 0; i<timesNoFormat.length; i++){
-          times.add(Tuple2(timesNoFormat[i].time, timesNoFormat[i].slots));
+          times.add(Tuple2(timesNoFormat[i]['time'].toString(), timesNoFormat[i]['slots']));
         }
         return times;
       }
 
       else {
+        print(response.statusCode);
         throw Exception ("Failed to request times");
       }
     }
@@ -152,6 +163,7 @@ class HTTPRequest {
     var uri = Uri.http(server, '/confirmReservation');
      var jsonString =  json.encode({'storeId': storeID, 'reservationId': reservationID, 'code_hash': hash,  'date': date,
     'time': time});
+    print(jsonString);
     final http.Response response = await http.post(uri, headers: <String, String> {
     'Content-Type': 'application/json' },
     body: jsonString);
