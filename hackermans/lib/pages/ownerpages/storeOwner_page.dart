@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hackermans/pages/ownerpages/scanQRCode_page.dart';
 import 'package:hackermans/src/HTTPRequests.dart';
 import 'package:hackermans/styles/styles.dart';
+import 'package:hackermans/styles/waitingScreen.dart';
 
 
 class StorePage extends StatefulWidget{
@@ -13,18 +14,18 @@ class StorePage extends StatefulWidget{
 
 class _StorePageState extends State<StorePage> {
   HTTPRequest request = HTTPRequest();
-  Duration refreshRate = Duration(seconds: 2);
+  Duration refreshRate = Duration(seconds: 1);
   Timer timer;
 
-  int storeId = 2;
-  int currentUser = 0;
+  int storeId = 1;
+  int currentUser;
   int maxUser = 50;
-  bool loading = false;
+  bool loading = true;
 
   @override
   initState(){
     super.initState();
-    //getCurrentCount(storeId);
+    getCurrentCount(storeId);
     //timer = Timer.periodic(refreshRate, (Timer t) => getCurrentCount(storeId));
   }
 
@@ -33,16 +34,48 @@ class _StorePageState extends State<StorePage> {
     super.dispose();
     timer.cancel();
     //getCurrentCount(storeId);
-    //timer = Timer.periodic(refreshRate, (Timer t) => getCurrentCount(storeId));
   }
 
   void getCurrentCount(int storeId) async {
+    print("Get count for store: $storeId");
     await request.getCounter(storeId)
       .then((value) {
-        this.currentUser = value;
         setState(() {
+          this.currentUser = value;
           loading = false;
         });
+      })
+      .catchError((e) {
+        print(e.toString());
+    });                       
+  }
+
+  void counterDown(int storeId) async {
+    print("Counter Down, storeId: $storeId");
+    await request.counterDown(storeId)
+      .then((value) {
+        print("Successfull: $value");
+        if (value) {
+          setState(() {
+            currentUser -= 1;
+          });
+        }        
+      })
+      .catchError((e) {
+        print(e.toString());
+    });                       
+  }
+
+  void counterUp(int storeId) async {
+    print("Counter Up, storeId: $storeId");
+    await request.counterUp(storeId)
+      .then((value) {
+        print("Successfull: $value");
+        if (value) {
+          setState(() {
+            currentUser += 1;
+          });
+        }        
       })
       .catchError((e) {
         print(e.toString());
@@ -95,13 +128,11 @@ class _StorePageState extends State<StorePage> {
                 Expanded(
                   child: FlatButton(
                     onPressed: (){
-                      setState(() {
-                        if (currentUser > 0) {
-                          currentUser -= 1;
-                          //request.counterDown(storeId);
-                        }
-                      });
-                    },                    child: Card(
+                      if (currentUser > 0){
+                        counterDown(storeId);
+                      }
+                    },  
+                  child: Card(
                       color: !(currentUser == maxUser) ? Colors.grey : Colors.blue,
                       child: Center(child: Text('-', style: Styles.bigInfoWhite,)),
                     ),
@@ -111,9 +142,8 @@ class _StorePageState extends State<StorePage> {
                   child: FlatButton(
                     onPressed: (){
                       setState(() {
-                        if (currentUser < maxUser) {
-                          currentUser += 1;
-                          //request.counterUp(storeId);
+                        if (currentUser < maxUser){
+                          counterUp(storeId);
                         }
                       });
                     },
@@ -164,13 +194,3 @@ class _StorePageState extends State<StorePage> {
   }
 }
 
-class WaitingBody extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-  }  
-}

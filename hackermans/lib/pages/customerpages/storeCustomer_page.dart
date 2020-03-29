@@ -1,9 +1,13 @@
 
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hackermans/pages/customerpages/storeCustomerReservation_page.dart';
+import 'package:hackermans/src/HTTPRequests.dart';
 import 'package:hackermans/styles/styles.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:hackermans/styles/waitingScreen.dart';
 
 
 class StoreCustomerPage extends StatefulWidget{
@@ -12,8 +16,54 @@ class StoreCustomerPage extends StatefulWidget{
 }
 
 class _StoreCustomerPageState extends State<StoreCustomerPage> {
-  int currentUser = 23;
+  HTTPRequest request = HTTPRequest();
+  Duration refreshRate = Duration(seconds: 1);
+  Timer timer;
+
+  bool loading = false;
+  int currentUser;
   int maxUser = 30;
+
+  @override
+  void initState() {
+    super.initState();
+    //getStoreInfo(widget.storeId);
+    //timer = Timer.periodic(refreshRate, (Timer t) => getCurrentCount(widget.storeId));
+  }
+
+  @override
+  void dispose(){
+    super.dispose();
+    //timer.cancel();
+  }
+
+  void getStoreInfo(int storeId) async {
+    print("Get count for store: $storeId");
+    await request.getCounter(storeId)
+      .then((value) {
+        setState(() {
+          // get store information
+          loading = false;
+        });
+      })
+      .catchError((e) {
+        print(e.toString());
+    });                       
+  }
+
+  void getCurrentCount(int storeId) async {
+    print("Get count for store: $storeId");
+    await request.getCounter(storeId)
+      .then((value) {
+        setState(() {
+          this.currentUser = value;
+          loading = false;
+        });
+      })
+      .catchError((e) {
+        print(e.toString());
+    });                       
+  }
 
   Widget _storeInfoBody(BuildContext context){
     return Padding(
@@ -26,7 +76,6 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
        ),
    ); 
   }
-
 
   Widget _reservationButton(BuildContext context){
     return FlatButton(
@@ -53,28 +102,32 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
   }
 
   Widget _counterBody(context){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        SizedBox(height: 50),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return ListView(
+        children: [
+          Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Center(child: Text(currentUser.toString(), style: Styles.bigInfo,)),
-            Center(child: Text('/${maxUser.toString()}', style: Styles.bigInfo,)),
+            SizedBox(height: 50),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Center(child: Text(currentUser.toString(), style: Styles.bigInfo,)),
+                Center(child: Text('/${maxUser.toString()}', style: Styles.bigInfo,)),
+              ],
+            ),
+            Center(child: Text('Available entries', style: Styles.text,)),
+            SizedBox(height: 20),
+            _reservationButton(context),
+            SizedBox(height: 50),
+            SizedBox(
+              height: 150,
+              width: MediaQuery.of(context).size.width,
+              child: StoreCustomerPrediction()
+            ),
+            _storeInfoBody(context)
           ],
         ),
-        Center(child: Text('Available entries', style: Styles.text,)),
-        SizedBox(height: 20),
-        _reservationButton(context),
-        SizedBox(height: 50),
-        SizedBox(
-          height: 150,
-          width: MediaQuery.of(context).size.width,
-          child: StoreCustomerPrediction()
-        ),
-        _storeInfoBody(context)
-      ],
+      ]
     );
   }
 
@@ -94,13 +147,7 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
                   Text('Migros Rapperswil', style: Styles.header,),
                 ],
               ),
-              Expanded(
-                child: ListView(
-                  children: <Widget>[
-                    _counterBody(context)
-                  ] 
-                ),
-              ),
+              (loading) ? WaitingBody() : _counterBody(context),
             ],
           ),
         ),
