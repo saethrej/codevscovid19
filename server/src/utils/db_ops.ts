@@ -13,21 +13,21 @@ const mysql = require('mysql')
 /** brief: initiates a database connection and returns connection object
  *
  * @returns connection object
- */
-export function db_connect() {
-  var connection = mysql.createConnection({
-    host: 'jenseir1.mysql.db.hostpoint.ch',
-    user: 'jenseir1_saethr',
-    password: 'FdAdd4G8',
-    database: 'jenseir1_codevscovid19'
-  })
-
-  connection.connect((err: any) => {
-    if (err) throw err
-  })
-
-  console.log('successfully connected to database.')
-  return connection
+*/
+export function db_connect() 
+{
+    var connection = mysql.createConnection({
+        host: 'jenseir1.mysql.db.hostpoint.ch',
+        user: 'jenseir1_saethr',
+        password: 'FdAdd4G8',
+        database: 'jenseir1_codevscovid19'
+    })
+    
+    connection.connect((err: any) => {
+        if (err) throw err
+    })
+    logger.info("Successfully connected to database.");
+    return connection
 }
 
 /** brief: disconnects the server from the database
@@ -44,15 +44,15 @@ function db_disconnect(dbcon: any) {
  * @param {*} callback function from the caller to return result
  * @returns {number} number of stores in database
  */
-export function db_getNumStores(dbcon: any, callback: any) {
-  var sql = 'SELECT count(*) FROM Stores'
-  dbcon.query(sql, function(err: any, result: any, fields: any) {
-    if (err) {
-      throw err
-    }
-    console.log(result)
-    return callback(result)
-  })
+export function db_getNumStores(dbcon: any, callback: any)
+{
+    var sql = "SELECT count(*) FROM Stores"
+    dbcon.query(sql, function(err: any, result: any, fields: any) {
+        if (err) {
+            throw err
+        }
+        return callback(result)
+    })
 }
 
 /** brief: returns a list of stores (store_id, long, lat) within a certain radius
@@ -190,39 +190,40 @@ export function db_getPeopleInStore(
  * @param callback function from the caller to return result
  * @returns {boolean} true if reservation is valid, false otherwise
  */
-export function db_checkReservation(
-  dbcon: any,
-  store_id: number,
-  reservation_id: any,
-  callback: any
-) {
-  logger.info('stuff' + store_id)
-  var sql =
-    'SELECT * FROM Reservations \
+export function db_checkReservation(dbcon: any, store_id: number, qr_hash: any, callback: any)
+{
+    // get current time and tolerance times
+    var msSinceEpoch = Date.now();
+    var upTolDate = new Date(msSinceEpoch + 600000);
+    var loTolDate = new Date(msSinceEpoch - 600000);
+    var upMin = upTolDate.getMinutes() < 10 ? "0" + upTolDate.getMinutes() : upTolDate.getMinutes();
+    var loMin = loTolDate.getMinutes() < 10 ? "0" + loTolDate.getMinutes() : loTolDate.getMinutes();
+
+    var upTime = "" + upTolDate.getHours() + upMin;
+    var loTime = "" + loTolDate.getHours() + loMin;
+
+    var sql = "SELECT * FROM Reservations2 \
                 WHERE store_id = ? \
                 AND qr_hash = ? \
                 AND date = CURDATE() \
-                AND reservation_time > CURRENT_TIME() - 600 \
-                AND reservation_time < CURRENT_TIME() + 600'
+                AND time > ? \
+                AND time < ?";
 
-  dbcon.query(sql, [store_id, reservation_id], function(
-    err: any,
-    result: any,
-    fields: any
-  ) {
-    // return false in case an error occurred
-    if (err) {
-      logger.error(err)
-      callback(false)
-      return
-    }
-    // return true if exactly one entry exists
-    if (result.length == 1) {
-      callback(true)
-    } else {
-      callback(false)
-    }
-  })
+    dbcon.query(sql, [store_id, qr_hash, loTime, upTime], function(err: any, result: any, fields: any) {
+        // return false in case an error occurred
+        if (err) {
+            logger.error(err)
+            callback(false) 
+            return
+        }
+        // return true if exactly one entry exists
+        if (result.length == 1) {
+            callback(true)
+        } else {
+            callback(false)
+        }
+
+    })
 }
 
 /** brief: returns the store data, i.e. its information and opening hours
@@ -251,22 +252,105 @@ export function db_getStoreData(dbcon: any, store_id: number, callback: any) {
   })
 }
 
-/**
- *
- * @param dbcon
- * @param store_id
- * @param date
- * @param time
- * @param email
- * @param callback
- * @returns JSON-object containing row of reservation if succesful, otherwise []
+/** brief: returns a list of reservations at a given store on a given date
+ * 
+ * @param dbcon the database connection
+ * @param store_id the unique id of the store
+ * @param date date of the reservation
+ * @param callback function from the caller to return result
+ * @returns array of reservations sorted by reservation time (from early to late)
  */
-export function db_makeReservation(
-  dbcon: any,
-  store_id: number,
-  date: string,
-  time: string,
-  hash: string,
-  email: string,
-  callback: any
-) {}
+export function db_getStoreReservations(dbcon: any, store_id: number, date: string, callback: any)
+{
+    var sql = "SELECT * FROM Reservations2 WHERE store_id = ? AND date = ? \
+                ORDER BY time DESC";
+    
+    dbcon.query(sql, [store_id, date], function(err: any, result: any, fields: any) {
+        // if an error occurred, log it and return empty list
+        if (err) {
+            logger.error(err);
+            callback([]);
+            return;
+        }
+        // otherwise, return the list
+        callback(result);
+    })
+}
+
+/** brief: reserve an available slots for given store, date, and time.
+ * 
+ * @param dbcon the database connection
+ * @param store_id the unique id of the store
+ * @param date date of the reservation
+ * @param time time (4 digit integer) of the reservation
+ * @param callback function from the caller to return result
+ * @returns array containing 1 row from Reservations table if successful, [] otherwise
+ */
+export function db_reserveReservationSlot(dbcon: any, store_id: number, date: string, time: number, callback: any)
+{
+    var sql = "INSERT INTO Reservations2 (store_id, date, time, confirmed) \
+                VALUES (?, ?, ?, 0)";
+
+    dbcon.query(sql, [store_id, date, time], function(err: any, result: any, fields: any) {
+        if (err) {
+            logger.error(err);
+            callback([]);
+        }
+        // check that only one row was inserted
+        if (result.affectedRows == 1) {
+            // retrieve the inserted row
+            dbcon.query("SELECT * FROM Reservations2 WHERE reservation_id = ?", [result.insertId], function(err: any, result: any, fields: any) {
+                // return an empty list if an error occurred in the second query
+                if (err) {
+                    logger.error(err);
+                    callback([]);
+                }
+                callback(result);
+            })
+        } else {
+            callback([]);
+        }
+    })
+}
+
+
+/** brief: confirm a reservation for given slot_id.
+ * 
+ * @param dbcon the database connection 
+ * @param reservation_id the unique id of the reservation
+ * @param {string} date date of the reservation
+ * @param {number} time time of reservation as 4-digit integer 
+ * @param callback function from the caller to return result
+ * @returns JSON-object containing row of reservation including a slot_id, or [] if error occurred
+ */
+export function db_confirmReservation(dbcon: any, reservation_id: string, qr_hash :string, callback: any)
+{
+    var sql = "UPDATE Reservations2 SET qr_hash = ?, confirmed = 1\
+                WHERE reservation_id = ? \
+                AND qr_hash IS NOT NULL \
+                AND confirmed = 0";
+    
+    dbcon.query(sql, [qr_hash, reservation_id], function(err: any, result: any, fields: any) {
+        // when an error occurs, return empty list
+        if (err) {
+            logger.error(err);
+            callback([]);
+            return;
+        }
+        // check if it only affected one row
+        if (result.affectedRows == 1) {
+            // perform new query to retrieve the reservation row
+            dbcon.query("SELECT * FROM Reservations2 WHERE reservation_id = ?", [reservation_id], function(err: any, result: any, fields: any) {
+                // return an empty list if an error occurred in the second query
+                if (err) {
+                    logger.error(err);
+                    callback([]);
+                }
+                callback(result);
+            })
+        } else{
+            callback([]); // return empty array
+        }
+    })
+}
+

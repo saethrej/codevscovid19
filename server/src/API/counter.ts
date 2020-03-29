@@ -36,7 +36,7 @@ exports.down = function(req: Request, res: Response) {
   })
 }
 
-/** brief: returns current value
+/** brief: returns current counter value of specified store
  * call with GET /getcounter/{id}
  *
  * @param {Request} req expects storeId:number with store id

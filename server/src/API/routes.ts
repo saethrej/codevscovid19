@@ -18,10 +18,16 @@ module.exports = function(app: any) {
   app.route('/getLocations').post(stores.locations)
 
   app.route('/getStoreData/:storeId').get(stores.dat)
-
+  
   var reservations = require('./reservations')
+  
+  app.route('/getavailableReservation')
+        .post(reservations.available)
 
-  app.route('/preReservation').post(reservations.pre)
-
-  app.route('/getReservation').post(reservations.confirm)
+    app.route('/reserveReservation')
+        .post(reservations.reserve)
+    
+    app.route('/confirmReservation')
+        .post(reservations.confirm)
 }
+
