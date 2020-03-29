@@ -21,6 +21,8 @@ dependencies:
     sdk: flutter
 
   qr_mobile_vision: ^0.3.1
+  mapbox_search: any
+  provider: any
   google_maps_flutter: ^0.5.25+2
   tuple: any
   table_calendar: ^2.2.3
