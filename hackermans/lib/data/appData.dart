@@ -10,6 +10,7 @@ class AppData with ChangeNotifier{
   GoogleMapController controller;
   CameraUpdate cameraUpdate;
   bool setCameraUpdate = false;
+  List<ReservationInformation> storedReservations = List<ReservationInformation>();
 
   // TODO: List of QR code object
   Map <String, ReservationInformation> QRCodeMap = Map <String, ReservationInformation>();

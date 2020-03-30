@@ -3,11 +3,13 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hackermans/data/appData.dart';
 import 'package:hackermans/pages/customerpages/storeCustomerReservation_page.dart';
 import 'package:hackermans/src/HTTPRequests.dart';
 import 'package:hackermans/styles/styles.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:hackermans/styles/waitingScreen.dart';
+import 'package:provider/provider.dart';
 
 
 class StoreCustomerPage extends StatefulWidget{
@@ -24,6 +26,7 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
   Duration refreshRate = Duration(seconds: 1);
   Timer timer;
 
+  String storeName;
   bool loading = false;
   int currentUser;
   int maxUser = 30;
@@ -43,6 +46,8 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
   }
 
   void getStoreInformation(int storeId) async {
+    /* this.storeName = ?
+    */
     print("Get count for store: $storeId");
     await request.getCounter(storeId)
       .then((value) {
@@ -136,6 +141,9 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final appData = Provider.of<AppData>(context);
+    //appData.storeName = this.storeName;
+    
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
