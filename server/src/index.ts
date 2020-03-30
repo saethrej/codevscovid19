@@ -62,15 +62,6 @@ async function startup() {
   //  cert: fs.readFileSync('./cert/cert.pem')
   // }
   const httpsServer = https.createServer(app)
-  //controllers for message controlling
-  //middleware for authentication
-  const ioserver = io()
-  ioserver.attach(httpServer)
-  ioserver.attach(httpsServer)
-  useSocketServer(ioserver, {
-    controllers: [`${__dirname}/controllers/**/*.sockcont.js`],
-    middlewares: [`${__dirname}/controllers/**/*.iomiddleware.js`]
-  })
 
   httpServer.on('error', err => {
     logger.error('Cannot set up express server!', err)
