@@ -21,16 +21,14 @@ class SearchPage extends StatefulWidget{
 class _SearchPageState extends State<SearchPage> {  
   TextEditingController controller = TextEditingController();
   
-  Duration refreshRate = Duration(seconds: 3);
+  Duration refreshRate = Duration(seconds: 1);
   Future<List<MapBoxPlace>> places;
   bool searching = false;
   Timer timer;
 
   //Places search sample call
   Future placesSearch() async {
-    print('try search');
     if (controller.text.isNotEmpty){
-      print('search succeeded');
       searching = true;
       var placesService = PlacesSearch(
         apiKey: "pk.eyJ1IjoibGl2aW9zIiwiYSI6ImNrNDdmdHJvNzBheGYza3BhejFkdGk0eG8ifQ.qG49BQpVKLCJWf7N-cMLHQ",
@@ -50,14 +48,14 @@ class _SearchPageState extends State<SearchPage> {
     // Clean up the controller when the widget is removed from the
     // widget tree.
     controller.dispose();
-    timer.cancel();
+    //timer.cancel();
     super.dispose();
   }
 
   @override
   void initState() {
-    controller.addListener(() {placesSearch();});
-    //timer = Timer.periodic(refreshRate, (Timer t) => placesSearch());
+    //controller.addListener(() {placesSearch();});
+    timer = Timer.periodic(refreshRate, (Timer t) => placesSearch());
     super.initState();
   }
 

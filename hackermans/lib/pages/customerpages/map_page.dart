@@ -1,6 +1,7 @@
 
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -8,10 +9,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hackermans/data/appData.dart';
 import 'package:hackermans/pages/customerpages/storeCustomer_page.dart';
 import 'package:hackermans/src/HTTPRequests.dart';
+import 'package:hackermans/src/UtilClasses.dart';
 
-import 'package:hackermans/src/locations.dart' as locations;
 import 'package:hackermans/styles/customMarker.dart';
 import 'package:provider/provider.dart';
+import 'package:tuple/tuple.dart';
 
 
 class MapPage extends StatefulWidget{
@@ -32,48 +34,81 @@ class FullMap extends StatefulWidget{
 }
 
 class _FullMapState extends State<FullMap> {
-  List<Marker> markers = [];
   GoogleMapController _controller;
 
   HTTPRequest request = HTTPRequest();
-  Duration refreshRate = Duration(seconds: 1);
+  Duration refreshRate = Duration(seconds: 5);
   Timer timer;
+
+  List<Marker> markers = [];
+  List<StoreInformation> currentShops;
+
+  bool loading = false;
+  LatLng curPosition;
+  CameraPosition initialCameraPosition = CameraPosition(
+    target: LatLng(47.39, 8.54),
+    zoom: 13,
+  );
 
   @override
   void initState() {
     super.initState();
+    timer = Timer.periodic(refreshRate, (Timer t) {loading = false;});
 
-    MarkerGenerator(markerWidgets(), (bitmaps) {
-      setState(() {
-        markers = mapBitmapsToMarkers(bitmaps);
-      });
-    }).generate(context);
   }
 
-  void _getStoreData() async {
+  void _getStoreData(LatLng position) async {
+    print("Get store data based on LatLng: $position");
+    loading = true;
 
+    var requestPosition = Tuple2<double, double>(position.longitude, position.latitude);
+    var requestLeft = Tuple2<double, double>(position.longitude-5, position.latitude);
+    var requestRight = Tuple2<double, double>(position.longitude+5, position.latitude);
+    var requestUp = Tuple2<double, double>(position.longitude, position.latitude+5);
+    var requestDown = Tuple2<double, double>(position.longitude, position.latitude-5);
 
-    MarkerGenerator(markerWidgets(), (bitmaps) {
-      setState(() {
-        markers = mapBitmapsToMarkers(bitmaps);
-      });
-    }).generate(context);
+   
+    // request store information
+    await request.sendCoordinates(requestPosition, requestLeft, requestRight, requestUp, requestDown)
+      .then((value) {
+        setState(() {
+          print('Updated current store list');
+          currentShops = value;
+        });
+      })
+      .catchError((e) {
+        print(e.toString());
+    }); 
+
+    print('Received shops $currentShops');
+
+    // build markers, set state  
+    print("Building markers");
+    if (currentShops.isNotEmpty){
+      MarkerGenerator(markerWidgets(), (bitmaps) {
+        setState(() {
+          markers = mapBitmapsToMarkers(bitmaps);
+        });
+      }).generate(context);                    
+    }
   }
 
   List<Marker> mapBitmapsToMarkers(List<Uint8List> bitmaps) {
     List<Marker> markersList = [];
     bitmaps.asMap().forEach((i, bmp) {
-      final city = cities[i];
+      final shop = currentShops[i];
+      print('Build marker of store ${shop.id}');
+      print('Build marker of store ${shop.latitude}');
+      print('Build marker of store ${shop.longitude}');
       markersList.add(
         Marker(
-          markerId: MarkerId(city.name),
-          position: city.position,
+          markerId: MarkerId(shop.id.toString()),
+          position: LatLng(shop.latitude, shop.longitude),
           icon: BitmapDescriptor.fromBytes(bmp),
           onTap: () {
-            int storeId = 1;
             Navigator.push(
               context, 
-              MaterialPageRoute(builder: (BuildContext context) => StoreCustomerPage(storeId))
+              MaterialPageRoute(builder: (BuildContext context) => StoreCustomerPage(shop.id))
             );
           }
         )
@@ -82,35 +117,9 @@ class _FullMapState extends State<FullMap> {
     return markersList;
   }
 
-  Widget _updateMarkers(BuildContext context){
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-              FlatButton(
-                onPressed: () {_getStoreData();},
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text('Search this region'),
-                  )
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _updateController(BuildContext context){
-    final appData = Provider.of<AppData>(context);
 
-    if(appData.setCameraUpdate) {
-      _controller.moveCamera(appData.cameraUpdate);
-      appData.setCameraUpdate = false;
-    }
+    
     return Container(height: 0, width: 0);
   }
 
@@ -118,46 +127,42 @@ class _FullMapState extends State<FullMap> {
     this._controller = controller;
   }
 
+  Future<void> _onCameraMove(CameraPosition position) async {
+    this.curPosition = position.target;
+    if (!loading){
+      _getStoreData(position.target);
+    } else {
+      print('sleeping');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[ 
-        GoogleMap(
-          myLocationEnabled: true,
-          initialCameraPosition: CameraPosition(
-            target: LatLng(0, 0),
-            zoom: 2,
-          ),
-          markers: markers.toSet(),
-          onMapCreated: _onMapCreated,
-        ),
-        _updateMarkers(context),
-        _updateController(context)
-      ]
+    final appData = Provider.of<AppData>(context);
+
+    if(appData.setCameraUpdate) {
+      setState(() {
+        this.initialCameraPosition = appData.cameraUpdate;
+        appData.setCameraUpdate = false;
+        _controller.moveCamera(CameraUpdate.newCameraPosition(initialCameraPosition));
+      }); 
+    }
+
+    return GoogleMap(
+      myLocationEnabled: true,
+      initialCameraPosition: initialCameraPosition,
+      markers: markers.toSet(),
+      onMapCreated: _onMapCreated,
+      onCameraMove: _onCameraMove,
     );
   }
 
-  // Example of backing data
-  List<City> cities = [
-    City("Zagreb", LatLng(45.792565, 15.995832)),
-    City("Ljubljana", LatLng(46.037839, 14.513336)),
-    City("Novo Mesto", LatLng(45.806132, 15.160768)),
-    City("Varaždin", LatLng(46.302111, 16.338036)),
-    City("Maribor", LatLng(46.546417, 15.642292)),
-    City("Rijeka", LatLng(45.324289, 14.444480)),
-    City("Karlovac", LatLng(45.489728, 15.551561)),
-    City("Klagenfurt", LatLng(46.624124, 14.307974)),
-    City("Graz", LatLng(47.060426, 15.442028)),
-    City("Celje", LatLng(46.236738, 15.270346))
-  ];
-
   List<Widget> markerWidgets() {
-    return cities.map((c) => _getMarkerWidget(c.name)).toList();
+    return currentShops.map((c) => _getMarkerWidget(c.numPeople)).toList();
   }
 
-
   // Example of marker widget
-  Widget _getMarkerWidget(String name) {
+  Widget _getMarkerWidget(int numPeople) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
       child: Container(
@@ -181,7 +186,7 @@ class _FullMapState extends State<FullMap> {
                 ),
                 SizedBox(height: 5),
                 Text(
-                  '35/40', 
+                  '$numPeople/40', 
                   style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w800)
                 )
               ],
@@ -192,11 +197,3 @@ class _FullMapState extends State<FullMap> {
     );
   }
 }
-
-class City {
-    final String name;
-    final LatLng position;
-
-    City(this.name, this.position);
-}
-
