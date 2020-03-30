@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:hackermans/data/appData.dart';
 import 'package:hackermans/pages/ownerpages/scanQRCode_page.dart';
 import 'package:hackermans/src/HTTPRequests.dart';
+import 'package:hackermans/src/UtilClasses.dart';
 import 'package:hackermans/styles/styles.dart';
 import 'package:hackermans/styles/waitingScreen.dart';
+import 'package:provider/provider.dart';
 
 
 class StorePage extends StatefulWidget{
@@ -16,6 +19,8 @@ class _StorePageState extends State<StorePage> {
   HTTPRequest request = HTTPRequest();
   Duration refreshRate = Duration(seconds: 5);
   Timer timer;
+
+  FullStoreInformation storeInfo;
 
   int storeId = 1;
   int currentUser = 1;
@@ -165,6 +170,9 @@ class _StorePageState extends State<StorePage> {
 
   @override
   Widget build(BuildContext context) {
+    final appData = Provider.of<AppData>(context);
+    storeInfo = appData.storeInfo;
+
     return Stack(
       children: [
         Scaffold(
@@ -177,7 +185,13 @@ class _StorePageState extends State<StorePage> {
                 children: <Widget>[
                   Row(
                     children: <Widget>[
-                      Text('Migros Zürich HB', style: Styles.headerLight,),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(storeInfo.city, style: Styles.headerLight,),
+                          Text('Migros ${storeInfo.address}', style: Styles.header,),
+                        ],
+                      ),
                       Spacer(),
                       Text('Logout', style: Styles.smalltext,),
                     ],
