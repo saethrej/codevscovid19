@@ -10,6 +10,7 @@
 * [Technical Details](#technical-details)
   * [Prerequisites](#prerequisites)
   * [Running the App](#running-the-app)
+* [Screenshots](#screenshots)
 * [Authors](#authors)
 
 ## About The Project
@@ -44,6 +45,8 @@ The reservation system allows a user to plan his or her shopping more comfortabl
 ### Prerequisites
 
 ### Running the App
+
+## Screenshots
 
 
 ## Authors
