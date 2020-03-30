@@ -1,19 +1,80 @@
 
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hackermans/data/appData.dart';
 import 'package:hackermans/pages/customerpages/storeCustomerReservation_page.dart';
+import 'package:hackermans/src/HTTPRequests.dart';
 import 'package:hackermans/styles/styles.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:hackermans/styles/waitingScreen.dart';
+import 'package:provider/provider.dart';
 
 
 class StoreCustomerPage extends StatefulWidget{
+  int storeId;
+
+  StoreCustomerPage(this.storeId);
+
   @override
   _StoreCustomerPageState createState() => _StoreCustomerPageState();
 }
 
 class _StoreCustomerPageState extends State<StoreCustomerPage> {
-  int currentUser = 23;
+  HTTPRequest request = HTTPRequest();
+  Duration refreshRate = Duration(seconds: 1);
+  Timer timer;
+
+  String storeName;
+  bool loading = false;
+  int currentUser;
   int maxUser = 30;
+
+  @override
+  initState(){
+    super.initState();
+    //getStoreInformation(widget.storeId);
+    //timer = Timer.periodic(refreshRate, (Timer t) => getCurrentCount(storeId));
+  }
+
+  @override
+  dispose(){
+    super.dispose();
+    timer.cancel();
+    //getCurrentCount(storeId);
+  }
+
+  void getStoreInformation(int storeId) async {
+    /* this.storeName = ?
+    */
+    print("Get count for store: $storeId");
+    await request.getCounter(storeId)
+      .then((value) {
+        setState(() {
+          this.currentUser = value;
+          loading = false;
+        });
+      })
+      .catchError((e) {
+        print(e.toString());
+    });                       
+  }
+
+  void getCurrentCount(int storeId) async {
+    print("Get count for store: $storeId");
+    await request.getCounter(storeId)
+      .then((value) {
+        setState(() {
+          this.currentUser = value;
+          loading = false;
+        });
+      })
+      .catchError((e) {
+        print(e.toString());
+    });                       
+  }
+
 
   Widget _storeInfoBody(BuildContext context){
     return Padding(
@@ -26,7 +87,6 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
        ),
    ); 
   }
-
 
   Widget _reservationButton(BuildContext context){
     return FlatButton(
@@ -53,33 +113,37 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
   }
 
   Widget _counterBody(context){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        SizedBox(height: 50),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Center(child: Text(currentUser.toString(), style: Styles.bigInfo,)),
-            Center(child: Text('/${maxUser.toString()}', style: Styles.bigInfo,)),
-          ],
-        ),
-        Center(child: Text('Available entries', style: Styles.text,)),
-        SizedBox(height: 20),
-        _reservationButton(context),
-        SizedBox(height: 50),
-        SizedBox(
-          height: 150,
-          width: MediaQuery.of(context).size.width,
-          child: StoreCustomerPrediction()
-        ),
-        _storeInfoBody(context)
-      ],
+    return Expanded(
+      child: ListView(
+        children: <Widget>[
+          SizedBox(height: 50),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Center(child: Text(currentUser.toString(), style: Styles.bigInfo,)),
+              Center(child: Text('/${maxUser.toString()}', style: Styles.bigInfo,)),
+            ],
+          ),
+          Center(child: Text('Available entries', style: Styles.text,)),
+          SizedBox(height: 20),
+          _reservationButton(context),
+          SizedBox(height: 50),
+          SizedBox(
+            height: 150,
+            width: MediaQuery.of(context).size.width,
+            child: StoreCustomerPrediction()
+          ),
+          _storeInfoBody(context)
+        ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final appData = Provider.of<AppData>(context);
+    //appData.storeName = this.storeName;
+    
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -94,13 +158,7 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
                   Text('Migros Rapperswil', style: Styles.header,),
                 ],
               ),
-              Expanded(
-                child: ListView(
-                  children: <Widget>[
-                    _counterBody(context)
-                  ] 
-                ),
-              ),
+              (loading) ? WaitingBody() : _counterBody(context),
             ],
           ),
         ),

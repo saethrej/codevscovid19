@@ -1,14 +1,16 @@
 
 
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hackermans/data/appData.dart';
 import 'package:hackermans/pages/customerpages/storeCustomer_page.dart';
+import 'package:hackermans/src/HTTPRequests.dart';
 
 import 'package:hackermans/src/locations.dart' as locations;
-import 'package:hackermans/styles/customMarke.dart';
+import 'package:hackermans/styles/customMarker.dart';
 import 'package:provider/provider.dart';
 
 
@@ -33,9 +35,23 @@ class _FullMapState extends State<FullMap> {
   List<Marker> markers = [];
   GoogleMapController _controller;
 
+  HTTPRequest request = HTTPRequest();
+  Duration refreshRate = Duration(seconds: 1);
+  Timer timer;
+
   @override
   void initState() {
     super.initState();
+
+    MarkerGenerator(markerWidgets(), (bitmaps) {
+      setState(() {
+        markers = mapBitmapsToMarkers(bitmaps);
+      });
+    }).generate(context);
+  }
+
+  void _getStoreData() async {
+
 
     MarkerGenerator(markerWidgets(), (bitmaps) {
       setState(() {
@@ -54,9 +70,10 @@ class _FullMapState extends State<FullMap> {
           position: city.position,
           icon: BitmapDescriptor.fromBytes(bmp),
           onTap: () {
+            int storeId = 1;
             Navigator.push(
               context, 
-              MaterialPageRoute(builder: (BuildContext context) => StoreCustomerPage())
+              MaterialPageRoute(builder: (BuildContext context) => StoreCustomerPage(storeId))
             );
           }
         )
@@ -65,6 +82,27 @@ class _FullMapState extends State<FullMap> {
     return markersList;
   }
 
+  Widget _updateMarkers(BuildContext context){
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+              FlatButton(
+                onPressed: () {_getStoreData();},
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text('Search this region'),
+                  )
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _updateController(BuildContext context){
     final appData = Provider.of<AppData>(context);
@@ -93,6 +131,7 @@ class _FullMapState extends State<FullMap> {
           markers: markers.toSet(),
           onMapCreated: _onMapCreated,
         ),
+        _updateMarkers(context),
         _updateController(context)
       ]
     );
@@ -132,7 +171,7 @@ class _FullMapState extends State<FullMap> {
         child: Padding(
           padding: const EdgeInsets.all(1.0),
           child: SizedBox(
-            height: 60,
+            height: 50,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -140,9 +179,10 @@ class _FullMapState extends State<FullMap> {
                   'Migros',
                   style: TextStyle(fontSize: 15, color: Colors.white),
                 ),
+                SizedBox(height: 5),
                 Text(
-                  '35', 
-                  style: TextStyle(fontSize: 30, color: Colors.white, fontWeight: FontWeight.w800)
+                  '35/40', 
+                  style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w800)
                 )
               ],
             ),

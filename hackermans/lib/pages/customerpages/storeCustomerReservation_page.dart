@@ -1,14 +1,23 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hackermans/data/appData.dart';
 import 'package:hackermans/pages/ownerpages/scanQRCode_page.dart';
 import 'package:hackermans/src/HTTPRequests.dart';
+import 'package:hackermans/src/UtilClasses.dart';
 import 'package:hackermans/styles/styles.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:tuple/tuple.dart';
 
+List<Tuple2<String, int>> reservationSlots = List<Tuple2<String, int>>();
+bool loading = true;
+String selectedDate;
+int storeId;
+String storeName;
 
 class StoreCustomerReservationPage extends StatefulWidget{
   @override
@@ -16,30 +25,121 @@ class StoreCustomerReservationPage extends StatefulWidget{
 }
 
 class _StoreCustomerReservationPageState extends State<StoreCustomerReservationPage> {
-  int currentUser = 23;
-  int maxUser = 30;
+  HTTPRequest request = HTTPRequest();
+  Duration refreshRate = Duration(milliseconds: 500);
+  Timer timer;
 
-  Widget _reservationSlotRecord(BuildContext context){
+  bool success = false;
+
+  @override
+  initState(){
+    super.initState();
+    timer = Timer.periodic(refreshRate, (Timer t) => setState((){}));
+  }
+
+  @override
+  dispose(){
+    super.dispose();
+    timer.cancel();
+    //getCurrentCount(storeId);
+  }
+
+  void _resetSnackBar(){
+    setState(() {
+      print('Snackbar deactivated');
+      sleep(Duration(seconds: 3));
+      success = false;
+    });
+  }
+  // get available slots based on slected date
+  Future<void> _getAvailableSlots({String date}) async {
+    print("Get Reservations for store $storeId at $date");
+    await request.requestTimes(storeId, date, "")
+      .then((value) {
+        setState(() {
+          reservationSlots = value;
+          loading = false;
+        });
+      })
+      .catchError((e) {
+        print(e.toString());
+    });                     
+  }
+
+  Future<void> postReservation({String date, String time}) async {
+    TemporaryReservationObject cur;
+    print("Get Reservations for store $storeId at $date");
+    await request.preReserve(storeId, date, time)
+      .then((value) {
+        setState(() {
+          cur = value;
+        });
+      })
+      .catchError((e) {
+        print(e.toString());
+    });   
+
+    //create reservations object
+    // TODO: randomize qrcode
+    var rng = Random();
+    var curReservation  =  ReservationInformation(cur.storeID, storeName, rng.nextInt(20000).toString() , cur.date, cur.time);
+
+    await request.reserve(cur.storeID, cur.reservationID, curReservation.qrHash , cur.date, cur.time)
+      .then((value) {
+        print('Reservation succeeded: $value');
+        if (value) {
+          setState(() {
+            success = true;
+            _getAvailableSlots();
+          });
+        }
+      })
+      .catchError((e) {
+        print(e.toString());
+    });   
+  }
+
+  Widget _reservationSlotRecord(BuildContext context, int index){
     return Card(
       elevation: 4,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('17:00', style: Styles.headline,),
-                Text('Shopping slot for direct access.', style: Styles.text,),
+                Row(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          (reservationSlots[index].item1.toString().length != 4) ? '${reservationSlots[index].item1.toString().substring(reservationSlots[index].item1.toString().length-3,reservationSlots[index].item1.toString().length-2 )}' :'${reservationSlots[index].item1.toString().substring(reservationSlots[index].item1.toString().length-4,reservationSlots[index].item1.toString().length-2 )}', 
+                          style: Styles.headline,
+                          ),
+                        Text(':', style: Styles.headline,),
+                        Text('${reservationSlots[index].item1.toString().substring(reservationSlots[index].item1.toString().length-2)}', style: Styles.headline,),
+                      ],
+                    ),
+                    Text('     ', style: Styles.headline,),
+                    Text('${reservationSlots[index].item2.toString()} slots open', style: Styles.textBold,),
+                  ],
+                ),
               ],
             ),
-            Card(
-              color: Colors.blue,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text('5 slots', style: Styles.textBoldWhite,),
-              )
+            FlatButton(
+              onPressed: () {
+                postReservation(date: selectedDate, time: reservationSlots[index].item1.toString());
+              },
+              child: Card(
+                color: Colors.blue,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text('Reserve', style: Styles.textBoldWhite),
+                )
+              ),
             ),
           ],
         ),
@@ -47,57 +147,81 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
     );
   }
 
-  Widget _reservationSlots(BuildContext context){
-    return Column(
-      children: <Widget>[
-        _reservationSlotRecord(context),
-        _reservationSlotRecord(context),
-        _reservationSlotRecord(context),
-        _reservationSlotRecord(context),        
-        _reservationSlotRecord(context),
-        _reservationSlotRecord(context)
-      ],
+  Widget _pageBody(BuildContext context){
+    return Expanded(
+      child: Column(
+        children: <Widget>[
+          CalendarBody(),
+          SizedBox(height: 20),
+          Expanded(
+            child: ListView.builder(
+              itemCount: reservationSlots.length,
+              itemBuilder: (context, index) {
+                return _reservationSlotRecord(context, index);
+              }
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _pageBody(BuildContext context){
-    return ListView(
-      children: <Widget>[
-        CalendarBody(),
-        SizedBox(height: 20),
-        _reservationSlots(context),
-      ],
+  Widget _snackBar(BuildContext context){
+    return AnimatedOpacity(
+      duration: Duration(milliseconds: 200),
+      opacity: success ? 1 : 0,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          Container(
+            color: Colors.greenAccent,
+            height: 100,
+            child: Center(child: 
+              Text('Reservation succeeded', style: Styles.headline,)
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final appData = Provider.of<AppData>(context);
+    storeName = appData.storeName;
+    storeId = appData.storeID;
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.all(25.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
+      body: Stack(
+        children: [
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  CupertinoNavigationBarBackButton(color: Colors.black),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
                     children: <Widget>[
-                      Text('Reservations', style: Styles.headerLight,),
-                      Text('Migros Rapperswil', style: Styles.header,),
+                      CupertinoNavigationBarBackButton(color: Colors.black),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text('Reservations', style: Styles.headerLight,),
+                          Text('Migros Rapperswil', style: Styles.header,),
+                        ],
+                      ),
                     ],
                   ),
+                  SizedBox(height: 40),
+                  _pageBody(context),
                 ],
               ),
-              SizedBox(height: 40),
-              Expanded(child: _pageBody(context)),
-            ],
+            ),
           ),
-        ),
+          _snackBar(context)
+        ]
       ),
     );
   }
@@ -114,7 +238,6 @@ class _CalendarBodyState extends State<CalendarBody> {
   Duration refreshRate = Duration(seconds: 2);
   Timer timer;
 
-  int storeId;
   // TODO: insert list for returned reservation slots
 
   @override
@@ -130,25 +253,30 @@ class _CalendarBodyState extends State<CalendarBody> {
   }
 
   // get available slots based on slected date
-  void _getAvailableSlots({String date}){
-    // list = request.getAvailableSlots(storeId, date)
+  Future<void> _getAvailableSlots({String date}) async {
+    print("Get Reservations for store $storeId at $date");
+    await request.requestTimes(storeId, date, "")
+      .then((value) {
+        setState(() {
+          reservationSlots = value;
+          loading = false;
+        });
+      })
+      .catchError((e) {
+        print(e.toString());
+    });                     
   }
-
-  void _bookSlot(int storeId, String date, String time ){
-    // bool = request.bookSlot(storeId, date, time)
-  }
-
 
   @override
   Widget build(BuildContext context) {
-    final appData = Provider.of<AppData>(context);
-    this.storeId = appData.storeID;
-
     Function(DateTime, DateTime, CalendarFormat) onCalendarCreated = (DateTime day, DateTime endDay, CalendarFormat format){
-      _getAvailableSlots(date: day.toString().substring(0, 10));
+      //_getAvailableSlots(date: day.toString().substring(0, 10));
+      selectedDate = DateTime.now().toString().substring(0, 10);
+      _getAvailableSlots(date: DateTime.now().toString().substring(0, 10));
     };
 
     Function(DateTime, List) onDaySelected = (DateTime day, List events) {
+      selectedDate = day.toString().substring(0, 10);
       _getAvailableSlots(date: day.toString().substring(0, 10));
     };
 
@@ -159,6 +287,7 @@ class _CalendarBodyState extends State<CalendarBody> {
         selectedColor: Colors.blue,
         todayColor: Colors.grey,
       ),
+      startDay: DateTime.now(),
       startingDayOfWeek: StartingDayOfWeek.saturday, 
       endDay: DateTime(2020, 13, 14),
       onCalendarCreated: onCalendarCreated,
