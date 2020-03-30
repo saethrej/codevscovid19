@@ -5,17 +5,19 @@ class StoreInformation{
   double longitude;
   double latitude;
   int numPeople;
+  int maxPeople;
   int id;
 
-  StoreInformation({this.longitude, this.latitude, this.numPeople, this.id});
+  StoreInformation({this.longitude, this.latitude, this.numPeople, this.maxPeople, this.id});
 
   factory StoreInformation.fromJson(Map<String, dynamic> json){
     print(json['longitude']);
     return StoreInformation(
       longitude: json['longitude'],
       latitude: json['latitude'],
-        numPeople: json['people_in_store'],
-      id: json['id'],
+      numPeople: json['people_in_store'],
+      maxPeople: json['max_people'],
+      id: json['store_id'],
     );
   }
 }
