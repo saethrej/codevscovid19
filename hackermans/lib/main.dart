@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hackermans/pages/customerpages/bookedReservations_page.dart';
@@ -31,6 +33,24 @@ class HomePage extends StatefulWidget{
 }
 
 class _HomePageState extends State<HomePage> {
+  Duration refreshRate = Duration(seconds: 5);
+  Timer timer;
+
+  @override
+  initState(){
+    super.initState();
+    timer = Timer.periodic(refreshRate, (Timer t) => setState((){}));
+  }
+
+  @override
+  dispose(){
+    super.dispose();
+    timer.cancel();
+    //getCurrentCount(storeId);
+  }
+
+
+
   Widget _searchButton(BuildContext context){
     return FlatButton(
       onPressed: () {

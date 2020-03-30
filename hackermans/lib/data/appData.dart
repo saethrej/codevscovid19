@@ -11,6 +11,7 @@ class AppData with ChangeNotifier{
   CameraPosition cameraUpdate;
   bool setCameraUpdate = false;
   List<ReservationInformation> storedReservations = List<ReservationInformation>();
+  FullStoreInformation storeInfo;
 
   void setID(int storeID) {
     this.storeID = storeID;

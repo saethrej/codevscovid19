@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:hackermans/data/appData.dart';
 import 'package:hackermans/pages/ownerpages/scanQRCode_page.dart';
 import 'package:hackermans/src/HTTPRequests.dart';
+import 'package:hackermans/src/UtilClasses.dart';
 import 'package:hackermans/styles/styles.dart';
 import 'package:hackermans/styles/waitingScreen.dart';
+import 'package:provider/provider.dart';
 
 
 class StorePage extends StatefulWidget{
@@ -16,6 +19,8 @@ class _StorePageState extends State<StorePage> {
   HTTPRequest request = HTTPRequest();
   Duration refreshRate = Duration(seconds: 5);
   Timer timer;
+
+  FullStoreInformation storeInfo;
 
   int storeId = 1;
   int currentUser = 1;
@@ -35,6 +40,25 @@ class _StorePageState extends State<StorePage> {
     timer.cancel();
     //getCurrentCount(storeId);
   }
+
+  void getStoreInformation(int storeId) async {
+    //Future<FullStoreInformation> getStoreData (int storeID) async{
+
+    print("Get information for store: $storeId");
+    await request.getStoreData(storeId)
+      .then((value) {
+        setState(() {
+          storeInfo = value;
+          maxUser = storeInfo.max_people;
+          currentUser = storeInfo.people_in_store;
+          loading = false;
+        });
+      })
+      .catchError((e) {
+        print(e.toString());
+    });                       
+  }
+
 
   void getCurrentCount(int storeId) async {
     print("Get count for store: $storeId");
@@ -165,19 +189,34 @@ class _StorePageState extends State<StorePage> {
 
   @override
   Widget build(BuildContext context) {
+    final appData = Provider.of<AppData>(context);
+    
+    if (appData.storeInfo == null){
+      getStoreInformation(storeId);
+      appData.storeInfo = storeInfo;
+    }
+
+    storeInfo = appData.storeInfo;
+
     return Stack(
       children: [
         Scaffold(
           backgroundColor: (currentUser >= maxUser) ? Colors.red : Colors.white,
           body: SafeArea(
-            child: Padding(
+            child:(loading) ? WaitingBody() : Padding(
               padding: const EdgeInsets.all(25.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Row(
                     children: <Widget>[
-                      Text('Migros Zürich HB', style: Styles.headerLight,),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(storeInfo.city, style: Styles.headerLight,),
+                          Text('Migros ${storeInfo.address}', style: Styles.header,),
+                        ],
+                      ),
                       Spacer(),
                       Text('Logout', style: Styles.smalltext,),
                     ],

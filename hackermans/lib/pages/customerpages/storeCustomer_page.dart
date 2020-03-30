@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:hackermans/data/appData.dart';
 import 'package:hackermans/pages/customerpages/storeCustomerReservation_page.dart';
 import 'package:hackermans/src/HTTPRequests.dart';
+import 'package:hackermans/src/UtilClasses.dart';
 import 'package:hackermans/styles/styles.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:hackermans/styles/waitingScreen.dart';
@@ -23,19 +24,19 @@ class StoreCustomerPage extends StatefulWidget{
 
 class _StoreCustomerPageState extends State<StoreCustomerPage> {
   HTTPRequest request = HTTPRequest();
-  Duration refreshRate = Duration(seconds: 1);
+  Duration refreshRate = Duration(seconds: 4);
   Timer timer;
 
-  String storeName;
-  bool loading = false;
-  int currentUser;
-  int maxUser = 30;
+  bool loading = true;
+  FullStoreInformation storeInfo;
+  int currentUser = 0;
+  int maxUser = 1;
 
   @override
   initState(){
     super.initState();
-    //getStoreInformation(widget.storeId);
-    //timer = Timer.periodic(refreshRate, (Timer t) => getCurrentCount(storeId));
+    getStoreInformation(widget.storeId);
+    timer = Timer.periodic(refreshRate, (Timer t) => getCurrentCount(widget.storeId));
   }
 
   @override
@@ -46,13 +47,15 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
   }
 
   void getStoreInformation(int storeId) async {
-    /* this.storeName = ?
-    */
-    print("Get count for store: $storeId");
-    await request.getCounter(storeId)
+    //Future<FullStoreInformation> getStoreData (int storeID) async{
+
+    print("Get information for store: $storeId");
+    await request.getStoreData(storeId)
       .then((value) {
         setState(() {
-          this.currentUser = value;
+          storeInfo = value;
+          maxUser = storeInfo.max_people;
+          currentUser = storeInfo.people_in_store;
           loading = false;
         });
       })
@@ -75,14 +78,104 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
     });                       
   }
 
-
   Widget _storeInfoBody(BuildContext context){
     return Padding(
      padding: const EdgeInsets.all(8.0),
      child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text('Information', style: Styles.textBold,),
+        Text('Opening Hours', style: Styles.textBold,),
+        Padding(
+          padding: const EdgeInsets.only(top: 15.0),
+          child: Row(
+            children:[
+              SizedBox(width: 10),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text('Monday', style: Styles.text,),
+                  SizedBox(height: 8),
+                  Text('Tuesday', style: Styles.text,),
+                  SizedBox(height: 8),
+                  Text('Wednesday', style: Styles.text,),
+                  SizedBox(height: 8),
+                  Text('Thursday', style: Styles.text,),
+                  SizedBox(height: 8),
+                  Text('Friday', style: Styles.text,),
+                  SizedBox(height: 8),
+                  Text('Saturday', style: Styles.text,),
+                  SizedBox(height: 8),
+                  Text('Sunday', style: Styles.text,),
+                ],
+              ),
+              SizedBox(width: 60),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Text(storeInfo.mon_open.substring(0,5), style: Styles.text,),
+                      Text(' to ', style: Styles.text,),
+                      Text(storeInfo.mon_close.substring(0,5), style: Styles.text,),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: <Widget>[
+                      Text(storeInfo.tue_open.substring(0,5), style: Styles.text,),
+                      Text(' to ', style: Styles.text,),
+                      Text(storeInfo.tue_close.substring(0,5), style: Styles.text,),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: <Widget>[
+                      Text(storeInfo.wed_open.substring(0,5), style: Styles.text,),
+                      Text(' to ', style: Styles.text,),
+                      Text(storeInfo.wed_close.substring(0,5), style: Styles.text,),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: <Widget>[
+                      Text(storeInfo.thu_open.substring(0,5), style: Styles.text,),
+                      Text(' to ', style: Styles.text,),
+                      Text(storeInfo.thu_close.substring(0,5), style: Styles.text,),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: <Widget>[
+                      Text(storeInfo.mon_open.substring(0,5), style: Styles.text,),
+                      Text(' to ', style: Styles.text,),
+                      Text(storeInfo.thu_close.substring(0,5), style: Styles.text,),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: <Widget>[
+                      Text(storeInfo.sun_open.substring(0,5), style: Styles.text,),
+                      Text(' to ', style: Styles.text,),
+                      Text(storeInfo.sun_close.substring(0,5), style: Styles.text,),
+                    ],
+                  ),  
+                  SizedBox(height: 8),
+                  Row(
+                    children: <Widget>[
+                      Text(storeInfo.sun_open.substring(0,5), style: Styles.text,),
+                      Text(' to ', style: Styles.text,),
+                      Text(storeInfo.sun_close.substring(0,5), style: Styles.text,),
+                    ],
+                  ),                  
+                ],
+              )
+            ]
+          ),
+        )
+        
       ],
        ),
    ); 
@@ -93,7 +186,7 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
       onPressed: () {
          Navigator.push(
             context, 
-            MaterialPageRoute(builder: (BuildContext context) => StoreCustomerReservationPage())
+            MaterialPageRoute(builder: (BuildContext context) => StoreCustomerReservationPage(widget.storeId))
           );
       },
       child: Card(
@@ -142,23 +235,29 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
   @override
   Widget build(BuildContext context) {
     final appData = Provider.of<AppData>(context);
-    //appData.storeName = this.storeName;
+    appData.storeInfo = this.storeInfo;
     
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(25.0),
-          child: Column(
+          child: (loading) ? WaitingBody() : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Row(
                 children: <Widget>[
                   CupertinoNavigationBarBackButton(color: Colors.black),
-                  Text('Migros Zürich HB', style: Styles.header,),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(storeInfo.city, style: Styles.headerLight,),
+                      Text('Migros ${storeInfo.address}', style: Styles.header,),
+                    ],
+                  ),
                 ],
               ),
-              (loading) ? WaitingBody() : _counterBody(context),
+              _counterBody(context),
             ],
           ),
         ),

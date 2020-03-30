@@ -46,8 +46,8 @@ class _FullMapState extends State<FullMap> {
   bool loading = false;
   LatLng curPosition;
   CameraPosition initialCameraPosition = CameraPosition(
-    target: LatLng(47.39, 8.54),
-    zoom: 13,
+    target: LatLng(47.379220, 8.53702),
+    zoom: 15.5,
   );
 
   @override
@@ -158,11 +158,11 @@ class _FullMapState extends State<FullMap> {
   }
 
   List<Widget> markerWidgets() {
-    return currentShops.map((c) => _getMarkerWidget(c.numPeople)).toList();
+    return currentShops.map((c) => _getMarkerWidget(c.numPeople, c.maxPeople)).toList();
   }
 
   // Example of marker widget
-  Widget _getMarkerWidget(int numPeople) {
+  Widget _getMarkerWidget(int numPeople, int maxPeople) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
       child: Container(
@@ -186,7 +186,7 @@ class _FullMapState extends State<FullMap> {
                 ),
                 SizedBox(height: 5),
                 Text(
-                  '$numPeople/40', 
+                  '$numPeople/$maxPeople', 
                   style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w800)
                 )
               ],
