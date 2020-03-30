@@ -229,7 +229,7 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text('Reservations', style: Styles.headerLight,),
-                          Text('Migros Rapperswil', style: Styles.header,),
+                          Text('Migros Zürich HB', style: Styles.header,),
                         ],
                       ),
                     ],

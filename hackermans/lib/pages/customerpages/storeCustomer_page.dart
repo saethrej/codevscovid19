@@ -155,7 +155,7 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
               Row(
                 children: <Widget>[
                   CupertinoNavigationBarBackButton(color: Colors.black),
-                  Text('Migros Rapperswil', style: Styles.header,),
+                  Text('Migros Zürich HB', style: Styles.header,),
                 ],
               ),
               (loading) ? WaitingBody() : _counterBody(context),

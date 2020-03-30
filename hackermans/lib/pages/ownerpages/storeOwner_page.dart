@@ -177,7 +177,7 @@ class _StorePageState extends State<StorePage> {
                 children: <Widget>[
                   Row(
                     children: <Widget>[
-                      Text('Migros Rapperswil', style: Styles.headerLight,),
+                      Text('Migros Zürich HB', style: Styles.headerLight,),
                       Spacer(),
                       Text('Logout', style: Styles.smalltext,),
                     ],
