@@ -100,76 +100,86 @@ export function db_getStoresInRectangle(dbcon: any, pos: any, rect: any, callbac
  * @param {callback fn} callback function from the caller to return result
  * @returns true if successful, false otherwise
  * 
- * @description This function also increments the history database of the given store and date combination.
+ * @description This function also checks wether max reached and
+ * increments the history database of the given store and date combination.
  */
-export function db_increase(dbcon: any, store_id: number, callback: any)
-{
-    var newArray = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-    var sql = "UPDATE Stores SET people_in_store = people_in_store + 1 \
+export function db_increase(dbcon: any, store_id: number, callback: any) {
+
+    //check if max reached
+    db_getStoreUtil(dbcon, store_id, function (res: any) {
+        if (res.length > 0 && res[0] != res[1]) {
+
+            var newArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            var sql = "UPDATE Stores SET people_in_store = people_in_store + 1 \
                  WHERE store_id = ?"
-    dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
-        if (err) {
-            logger.error(err)
-            callback(false)
-            return
-        }
-        // if the query was successful, update the history database
-        if (result.affectedRows == 1 && result.warningCount == 0) {
-
-            // get current date
-            var timezoneOffset = new Date().getTimezoneOffset() * 60000
-            var d = new Date() // current, local timezone
-            var date:string = (new Date(Date.now() - timezoneOffset)).toISOString().substr(0, 10) // also in current time-zone
-
-            // check whether an entry in the history database already exists
-            dbcon.query("SELECT * FROM History WHERE store_id = ? AND date = ?", [store_id, date], function(err: any, result: any, fields: any) {
-                // if an error occurs here, only log it - we can live with a faulty history DB
+            dbcon.query(sql, [store_id], function (err: any, result: any, fields: any) {
                 if (err) {
                     logger.error(err)
-                    callback(true)
+                    callback(false)
                     return
                 }
-                // if result is empty, then this is the first customer of the day in the store - create new entry
-                if (result.length == 0) {
-                    // add first customer of the day to the array
-                    newArray[d.getHours()] += 1
-                    dbcon.query("INSERT INTO History (store_id, date, customers) VALUES (?, ?, ?)", [store_id, date, JSON.stringify(newArray)], function(err: any, result: any, fields: any) {
+                // if the query was successful, update the history database
+                if (result.affectedRows == 1 && result.warningCount == 0) {
+
+                    // get current date
+                    var timezoneOffset = new Date().getTimezoneOffset() * 60000
+                    var d = new Date() // current, local timezone
+                    var date: string = (new Date(Date.now() - timezoneOffset)).toISOString().substr(0, 10) // also in current time-zone
+
+                    // check whether an entry in the history database already exists
+                    dbcon.query("SELECT * FROM History WHERE store_id = ? AND date = ?", [store_id, date], function (err: any, result: any, fields: any) {
                         // if an error occurs here, only log it - we can live with a faulty history DB
                         if (err) {
                             logger.error(err)
                             callback(true)
                             return
                         }
-                        callback(true)
-                        return
+                        // if result is empty, then this is the first customer of the day in the store - create new entry
+                        if (result.length == 0) {
+                            // add first customer of the day to the array
+                            newArray[d.getHours()] += 1
+                            dbcon.query("INSERT INTO History (store_id, date, customers) VALUES (?, ?, ?)", [store_id, date, JSON.stringify(newArray)], function (err: any, result: any, fields: any) {
+                                // if an error occurs here, only log it - we can live with a faulty history DB
+                                if (err) {
+                                    logger.error(err)
+                                    callback(true)
+                                    return
+                                }
+                                callback(true)
+                                return
+                            })
+
+                            // the entry already exists: "update" it by getting current entry, unserializing it, updating the underlying array, serialize it back and update DB entry
+                        } else {
+                            // get the customers array and update it
+                            var array = JSON.parse(result[0]['customers'])
+                            array[d.getHours()] += 1
+
+                            // update the row in the database
+                            dbcon.query("UPDATE History SET customers = ? WHERE store_id = ? AND date = ?", [JSON.stringify(array), store_id, date], function (err: any, result: any, fields: any) {
+                                // if an error occurs here, only log it - we can live with a faulty history DB
+                                if (err) {
+                                    logger.error(err)
+                                    callback(true)
+                                    return
+                                }
+                                // there's no point in further examining whether the operation was succesful here, as we execute callback(true) anyway
+                                callback(true)
+                                return
+                            })
+
+                        }
                     })
-                
-                // the entry already exists: "update" it by getting current entry, unserializing it, updating the underlying array, serialize it back and update DB entry
+
+                    // if the query was not succesfull, return false
                 } else {
-                    // get the customers array and update it
-                    var array = JSON.parse(result[0]['customers'])
-                    array[d.getHours()] += 1
-
-                    // update the row in the database
-                    dbcon.query("UPDATE History SET customers = ? WHERE store_id = ? AND date = ?", [JSON.stringify(array), store_id, date], function(err: any, result: any, fields: any) {
-                        // if an error occurs here, only log it - we can live with a faulty history DB
-                        if (err) {
-                            logger.error(err)
-                            callback(true)
-                            return
-                        }
-                        // there's no point in further examining whether the operation was succesful here, as we execute callback(true) anyway
-                        callback(true)
-                        return
-                    })
-
+                    callback(false)
+                    return
                 }
             })
-        
-        // if the query was not succesfull, return false
-        } else {
+        }
+        else {
             callback(false)
-            return
         }
     })
 }
