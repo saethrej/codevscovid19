@@ -1,5 +1,3 @@
-//define database somehow
-
 import { logger } from '../logger'
 import { Request, Response } from "express"
 import { db_checkReservation, db_increase, db_getPeopleInStore, db_checkCredentials } from '../utils/db_ops'
@@ -15,6 +13,7 @@ import { db_checkReservation, db_increase, db_getPeopleInStore, db_checkCredenti
 exports.check = function (req: Request, res: Response) {
     let store_id: number = parseInt(req.body.store_id) //number
     let code_hash = req.body.code_hash //QR Code
+    //dummy values for testing if none provided
     let pw = 'a7YLnpYh1b'
     let username = '2coolMovie'
     if (typeof req.get('user') !== 'undefined') {
@@ -24,7 +23,7 @@ exports.check = function (req: Request, res: Response) {
         pw = req.get('pw') + ''
     }
     db_checkCredentials(DB, store_id, username, pw, function (authenticated: boolean) {
-        if (authenticated) {
+        if (true) { //replace true with authenticated. currently authentication ignored for testing
             db_checkReservation(DB, store_id, code_hash, function (result: any) {
                 if (result) {
                     db_increase(DB, store_id, function (result_1: any) {

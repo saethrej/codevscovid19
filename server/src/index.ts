@@ -16,11 +16,7 @@ import http from 'http'
 
 import bodyParser = require('body-parser')
 
-// import { setupDB } from './utils/database'
-
 import { db_connect } from './utils/db_ops'
-
-// var connection = dataBase.connect(); 
 
 const db = db_connect();
 global.DB = db;
@@ -48,12 +44,6 @@ useExpressServer(app, {
 // last listener for error handling
 // error handler
 app.use(errorMiddleware)
-
-app.get('/', function (req, res) {
-  logger.info("Got a GET request for the homepage");
-  let name = __dirname
-  res.sendFile(name.substring(0, name.length - 6) + '/src/index.html');
-})
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
