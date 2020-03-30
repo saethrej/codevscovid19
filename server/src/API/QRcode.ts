@@ -23,7 +23,6 @@ exports.check = function (req: Request, res: Response) {
     if (typeof req.get('pw') !== 'undefined') {
         pw = req.get('pw') + ''
     }
-    logger.info(username)
     db_checkCredentials(DB, store_id, username, pw, function (authenticated: boolean) {
         if (authenticated) {
             db_checkReservation(DB, store_id, code_hash, function (result: any) {
@@ -35,7 +34,7 @@ exports.check = function (req: Request, res: Response) {
                     })
                 }
                 else {
-                    res.end(JSON.stringify({ 'success': false }))
+                    res.end(JSON.stringify({ 'success': false, 'error': 'wrong code' }))
                 }
             })
         }

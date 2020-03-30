@@ -99,9 +99,12 @@ export function db_getStoresInRectangle(dbcon: any, pos: any, rect: any, callbac
  * @param {*} store_id the unique id of the store
  * @param {callback fn} callback function from the caller to return result
  * @returns true if successful, false otherwise
+ * 
+ * @description This function also increments the history database of the given store and date combination.
  */
 export function db_increase(dbcon: any, store_id: number, callback: any)
 {
+    var newArray = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
     var sql = "UPDATE Stores SET people_in_store = people_in_store + 1 \
                  WHERE store_id = ?"
     dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
@@ -110,11 +113,63 @@ export function db_increase(dbcon: any, store_id: number, callback: any)
             callback(false)
             return
         }
-        // check whether the update was successful or not
+        // if the query was successful, update the history database
         if (result.affectedRows == 1 && result.warningCount == 0) {
-            callback(true)
+
+            // get current date
+            var timezoneOffset = new Date().getTimezoneOffset() * 60000
+            var d = new Date() // current, local timezone
+            var date:string = (new Date(Date.now() - timezoneOffset)).toISOString().substr(0, 10) // also in current time-zone
+
+            // check whether an entry in the history database already exists
+            dbcon.query("SELECT * FROM History WHERE store_id = ? AND date = ?", [store_id, date], function(err: any, result: any, fields: any) {
+                // if an error occurs here, only log it - we can live with a faulty history DB
+                if (err) {
+                    logger.error(err)
+                    callback(true)
+                    return
+                }
+                // if result is empty, then this is the first customer of the day in the store - create new entry
+                if (result.length == 0) {
+                    // add first customer of the day to the array
+                    newArray[d.getHours()] += 1
+                    dbcon.query("INSERT INTO History (store_id, date, customers) VALUES (?, ?, ?)", [store_id, date, JSON.stringify(newArray)], function(err: any, result: any, fields: any) {
+                        // if an error occurs here, only log it - we can live with a faulty history DB
+                        if (err) {
+                            logger.error(err)
+                            callback(true)
+                            return
+                        }
+                        callback(true)
+                        return
+                    })
+                
+                // the entry already exists: "update" it by getting current entry, unserializing it, updating the underlying array, serialize it back and update DB entry
+                } else {
+                    // get the customers array and update it
+                    var array = JSON.parse(result[0]['customers'])
+                    array[d.getHours()] += 1
+
+                    // update the row in the database
+                    dbcon.query("UPDATE History SET customers = ? WHERE store_id = ? AND date = ?", [JSON.stringify(array), store_id, date], function(err: any, result: any, fields: any) {
+                        // if an error occurs here, only log it - we can live with a faulty history DB
+                        if (err) {
+                            logger.error(err)
+                            callback(true)
+                            return
+                        }
+                        // there's no point in further examining whether the operation was succesful here, as we execute callback(true) anyway
+                        callback(true)
+                        return
+                    })
+
+                }
+            })
+        
+        // if the query was not succesfull, return false
         } else {
             callback(false)
+            return
         }
     })
 }
@@ -363,5 +418,61 @@ export function db_checkCredentials(dbcon: any, store_id: number, username: stri
         } else {
             callback(false)
         }
+    })
+}
+
+/** brief: returns historic data for the desired store and date
+ * 
+ * @param dbcon the database connection
+ * @param store_id the id of the store to retrieve historic data
+ * @param date the desired date for the historic data
+ * @param callback function from the caller to return result
+ * @returns a list containing a single object of type {store_id, date, customers=[count(timeslot1), count(timeslot2), count(timeslot3), ...]} 
+ * where the inner array is of length 24, [] if invalid query
+ */
+export function db_getDailyHistory(dbcon: any, store_id: number, date: string, callback: any) 
+{
+    var sql = "SELECT * FROM History WHERE store_id = ? AND date = ?"
+
+    dbcon.query(sql, [store_id, date], function(err: any, result: any, fields: any) {
+        // return empty list if error occurred during query
+        if (err) {
+            logger.error(err)
+            callback([])
+            return
+        }
+
+        // return result if and only if one such entry was found
+        if (result.length == 1) {
+            callback(result)
+        } else {
+            callback([])
+        }
+    })
+}
+
+/** brief: returns an array with the current number in store and max people allowed
+ * 
+ * @param dbcon the database connection 
+ * @param store_id id of the store
+ * @param callback function from the caller to return result 
+ * @returns [people_in_store, max_people]
+ * 
+ * @throws exception if the query fails 
+ */
+export function db_getStoreUtil(dbcon: any, store_id: number, callback: any)
+{
+    var sql = "SELECT people_in_store, max_people FROM Stores WHERE store_id = ?"
+
+    dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
+        // log and throw error if the query fails
+        if (err) {
+            logger.error(err)
+            throw err
+        }
+        var res = [];
+        res.push(result[0]['people_in_store'])
+        res.push(result[0]['max_people'])
+        callback(res);
     })
 }
