@@ -21,7 +21,6 @@ exports.up = function (req: Request, res: Response) {
     if (typeof req.get('pw') !== 'undefined') {
         pw = req.get('pw') + ''
     }
-    logger.info(username)
     db_checkCredentials(DB, store_id, username, pw, function (authenticated: boolean) {
         if (authenticated) {
             db_increase(DB, store_id, function (result_1: any) {
@@ -53,7 +52,6 @@ exports.down = function (req: Request, res: Response) {
     if (typeof req.get('pw') !== 'undefined') {
         pw = req.get('pw') + ''
     }
-    logger.info(username)
     db_checkCredentials(DB, store_id, username, pw, function (authenticated: boolean) {
         if (authenticated) {
             db_decrease(DB, store_id, function (result_1: any) {
