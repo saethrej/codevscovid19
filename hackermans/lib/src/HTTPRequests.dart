@@ -98,7 +98,7 @@ class HTTPRequest {
       'Content-Type': 'application/json' },
       body: jsonString
     );
-    if(response.statusCode == 200){
+    if(response.statusCode == 200 && jsonDecode(response.body)['success']){
        List closeStores = List<StoreInformation>();
       var stores = jsonDecode(response.body)['stores'];
       for(var i =0; i<stores.length; i++){
@@ -120,7 +120,7 @@ class HTTPRequest {
     'Content-Type': 'application/json' },
     body: jsonString);
     List<Tuple2<String, int>>  times = List<Tuple2<String, int>> ();
-    if(response.statusCode == 200){
+    if(response.statusCode == 200 && jsonDecode(response.body)['success']){
       var timesNoFormat = jsonDecode(response.body)['reservations'];
       if(times == null){
         return null;
@@ -144,7 +144,7 @@ class HTTPRequest {
     final http.Response response = await http.post(uri, headers: <String, String> {
     'Content-Type': 'application/json' },
        body: jsonString);
-    if(response.statusCode == 200){
+    if(response.statusCode == 200 && jsonDecode(response.body)['success']){
 
       var customers = jsonDecode(response.body)['customers'];
       List<double> customerList = List<double>();
@@ -165,7 +165,7 @@ class HTTPRequest {
   Future<FullStoreInformation> getStoreData (int storeID) async{
     var uri = Uri.http(server, 'getStoreData/' + storeID.toString());
     final http.Response response = await http.get(uri);
-    if(response.statusCode == 200){
+    if(response.statusCode == 200 && jsonDecode(response.body)['success']){
       var json = jsonDecode(response.body)['storeData'][0];
       var res =  FullStoreInformation.fromJson(jsonDecode(json));
       return res;
