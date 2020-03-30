@@ -1,4 +1,4 @@
-# Super Cool Name of Our Project
+# STO-RES - A Quarantine-Friendly Store Reservation System
 
 This project was created as a part of the ZuriHack "CodeVsCOVID19" hackathon.
 <!-- TABLE OF CONTENTS -->
@@ -21,20 +21,20 @@ Switzerland is on lockdown. Restaurants, bars, museums, etc. have been closed an
 However, for grocery shopping or getting medical prescriptions from the drug store, people still have to leave their homes. As there are strict regulations on how many people are allowed to be in a room, we often encounter long queues in front of stores like Migros or Coop. In the latter case, people are given a numbered card upon entry that they have to return when leaving the store. This solution is unhygienic and inefficient.
 
 ### A Real-Time View of Store Capacity
-NAME_PLACEHOLDER is an app that runs on both iOS and Android smartphones and displays real-time data on stores arround your current or a custom location:
+STO-RES is an app that runs on both iOS and Android smartphones and displays real-time data on stores arround your current or a custom location:
 - The maximum number of people allowed in the store.
 - The current number of people that are in the store.
 - Historic data that show when stores are the most- and least crowded.
 
-From the user's perspective, NAME_PLACEHOLDER allows him or her to shop more efficiently and avoid people by choosing to shop in the least crowded store. From a higher perspective, NAME_PLACEHOLDER helps to reduce the risk of transmission of Covid-19 by providing load-balancing across stores for an essential activity where people have to leave their homes.
+From the user's perspective, STO-RES allows him or her to shop more efficiently and avoid people by choosing to shop in the least crowded store. From a higher perspective, STO-RES helps to reduce the risk of transmission of Covid-19 by providing load-balancing across stores for an essential activity where people have to leave their homes.
 
 ### A Store Management System
-The NAME_PLACEHOLDER app offers both a customer and a store side. The security personnel at the store entrance can use the app to increase and decrease the people count when people enter and leave the store, respectively, which updates the database in real-time. The app can be operated by multiple security personnel at once in case there are multiple entrances and exits.
+The STO-RES app offers both a customer and a store side. The security personnel at the store entrance can use the app to increase and decrease the people count when people enter and leave the store, respectively, which updates the database in real-time. The app can be operated by multiple security personnel at once in case there are multiple entrances and exits.
 
 This increases efficiency as the database takes care of synchronization accross multiple users and also increases hygiene because it eliminates the need for entry cards that potentially hundreds of people touch over the course of a single day.
 
 ### A Reservation System for Fast Store Access
-NAME_PLACEHOLDER additionally offers a reservation system for entry slots. Each store dedicates a percentage of its available entry slots to online reservation. Users can then book a such slot for a store at a designated date and time and be granted direct access by skipping the line. The process is as follows:
+STO-RES additionally offers a reservation system for entry slots. Each store dedicates a percentage of its available entry slots to online reservation. Users can then book a such slot for a store at a designated date and time and be granted direct access by skipping the line. The process is as follows:
 
 1. The user selects a store, a date and a desired entry time on the app.
 2. The user makes a confirmation request by pressing the "Book" button.
