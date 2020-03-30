@@ -167,7 +167,9 @@ class HTTPRequest {
     final http.Response response = await http.get(uri);
     if(response.statusCode == 200 && jsonDecode(response.body)['success']){
       var json = jsonDecode(response.body)['storeData'][0];
-      var res =  FullStoreInformation.fromJson(jsonDecode(json));
+      print(json);
+      var res =  FullStoreInformation.fromJson(json);
+      print(res);
       return res;
     }
 
