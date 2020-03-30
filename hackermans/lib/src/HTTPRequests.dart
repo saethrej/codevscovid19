@@ -162,6 +162,21 @@ class HTTPRequest {
     }
   }
 
+  Future<FullStoreInformation> getStoreData (int storeID) async{
+    var uri = Uri.http(server, 'getStoreData/' + storeID.toString());
+    final http.Response response = await http.get(uri);
+    if(response.statusCode == 200){
+      var json = jsonDecode(response.body)['storeData'][0];
+      var res =  FullStoreInformation.fromJson(jsonDecode(json));
+      return res;
+    }
+
+    else {
+      throw Exception('failed to get store data' + response.toString());
+    }
+
+  }
+
  
   // reserve a slot for later reservation on success
   Future<TemporaryReservationObject> preReserve(int storeID, String date, String time) async {

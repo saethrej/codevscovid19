@@ -11,7 +11,6 @@ class StoreInformation{
   StoreInformation({this.longitude, this.latitude, this.numPeople, this.maxPeople, this.id});
 
   factory StoreInformation.fromJson(Map<String, dynamic> json){
-    print(json['longitude']);
     return StoreInformation(
       longitude: json['longitude'],
       latitude: json['latitude'],
@@ -20,6 +19,90 @@ class StoreInformation{
       id: json['store_id'],
     );
   }
+}
+
+
+class FullStoreInformation{
+    int store_id;
+    String address;
+    String city;
+    String zip_code;
+    String canton;
+    String country;
+    double latitude;
+    double longitude;
+    int max_people;
+    int people_in_store;
+    int avg_time_in_store;
+    String mon_open;
+    String mon_close;
+    String tue_open;
+    String tue_close;
+    String wed_open;
+    String wed_close;
+    String thu_open;
+    String thu_close;
+    String fri_open;
+    String fri_close;
+    String sat_open;
+    String sat_close;
+    String sun_open;
+    String sun_close;
+
+    FullStoreInformation({this.store_id,
+    this.address,
+    this.city,
+    this.zip_code,
+    this.canton,
+    this.country,
+    this.latitude,
+    this.longitude,
+    this.max_people,
+    this.people_in_store,
+    this.avg_time_in_store,
+    this.mon_open,
+    this.mon_close,
+    this.tue_open,
+    this.tue_close,
+    this.wed_open,
+    this.wed_close,
+    this.thu_open,
+    this.thu_close,
+    this.fri_open,
+    this.fri_close,
+    this.sat_open,
+    this.sat_close,
+    this.sun_open,
+    this.sun_close});
+
+    factory FullStoreInformation.fromJson(Map<String, dynamic> json){
+      return FullStoreInformation( store_id : json['store_id'],
+    address: json['address'],
+     city: json['city'],
+     zip_code: json['zip_code'],
+     canton: json['canton'],
+     country: json['country'],
+     latitude: json['latitude'],
+     longitude: json['longitutde'],
+     max_people: json['max_people'],
+     people_in_store : json ['people_in_store'],
+     avg_time_in_store: json['avg_time_in_store'],
+     mon_open : json['mon_open'],
+     mon_close: json['mon_close'],
+     tue_open: json['tue_open'],
+     tue_close: json['tue_close'],
+     wed_open: json['wed_open'],
+     wed_close: json['wed_close'],
+     thu_open: json['thu_open'],
+     thu_close: json['thu_close'],
+     fri_open: json['fri_open'],
+     fri_close: json['fri_close'],
+     sat_open: json['sat_open'],
+     sat_close: json ['sat_close'],
+     sun_open: json ['sun_open'],
+     sun_close: json['sun_close'],
+      );
+    }
 }
 
 
@@ -57,19 +140,30 @@ class PersistenJSONConverter {
     return instance;
   }
 
-  static Map<int, ReservationInformation> JSONToMap(String jsonobj){
+  Map<int, ReservationInformation> JSONToMap(String jsonobj){
     Map res = Map<int, ReservationInformation>();
-    var map = jsonDecode(jsonobj)['map'];
+    var map = jsonDecode(jsonobj);
     for(var i = 0; i < map.length; i++){
-      int storeID = map[i].storeID;
-      String storeName = map[i].storeName;
-      String qrHash = map[i].qrHash;
-      String date = map[i].date;
-      String time = map[i].time;
+      int storeID = map[i]['storeID'];
+      String storeName = map[i]['storeName'];
+      String qrHash = map[i]['qrHash'];
+      String date = map[i]['date'];
+      String time = map[i]['time'];
       ReservationInformation inf = ReservationInformation(storeID,
       storeName,qrHash,date,time);
       res.putIfAbsent(map[i].storeID, () => inf);
     }
+    print(res);
+    return res;
+  }
+
+  dynamic MaptoJSON(Map<int, ReservationInformation> map){
+    List tmpList = List();
+    map.forEach((k,v) {
+      tmpList.add(v);
+    });
+    print(jsonEncode(tmpList));
+    return jsonEncode(tmpList);
   }
 
 
