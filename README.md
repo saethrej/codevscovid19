@@ -1,5 +1,6 @@
 # Super Cool Name of Our Project
 
+This project was created as a part of the ZuriHack "CodeVsCOVID19" hackathon.
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
 
@@ -10,6 +11,7 @@
 * [Technical Details](#technical-details)
   * [Prerequisites](#prerequisites)
   * [Running the App](#running-the-app)
+  * [System Info](#system-info)
 * [Screenshots](#screenshots)
 * [Authors](#authors)
 
@@ -43,16 +45,52 @@ The reservation system allows a user to plan his or her shopping more comfortabl
 
 ## Technical Details
 ### Prerequisites
+You will need a working installation of Node.js as well as Flutter. Please follow their instructions of how to set up [here](https://nodejs.org/en/) and [here](https://flutter.dev/docs/get-started/install), respectively.
 
 ### Running the App
+Open the folder server and frontend. Start the server by runnning `yarn install` and then `yarn start`. The server listens to port 8000 on localhost. Next, start the frontend app by running `flutter run` in the frontend folder. Navigate on the emulator to test the app.
+
+Important: Depending on whether you run the simulator on iOS, you will need to change the server variable of the local server in the file HTTPRequests.dart, i.e 10.0.2.2:8000 for Android and localhost:8000 for iOS.
+
+### System Info
+The entire system system consists of multiple entities, of which only the iOS and Android app for both customers are publicly visible, which we introduce shortly
+
+#### iOS and Android App
+The app allows customers to see stores around them on a map with their capacity and current utilization, to make reservations for a store and time slot and to skip the queue via a saved QR code, while the app allows multiple security personnel at store entries and exits to enforce the government regulations.
+The app is programmed in Dart.
+
+#### Server Backend and API
+The public API enables not only our app to gather the relevant information but also offers the possibility for other websites or applications to access it. While some functionality requires authentication (e.g. things that only store security personnel should be able to control) and is therefore not available for the public, other information can be requested through simple GET and POST requests. This would e.g. allow for displaying the current number of customers in a store on the retailers website in realtime, making this important information available for everybody. 
+
+#### Database System
+All information is stored in a centralized database system based on MySQL 5.7. This includes data about stores (e.g. geolocation, address, number of people in stores), reservations, security personnel credentials, but also historic store activity data. The database system communicates with the server backend and processes all the requests that the latter receives from the app. It is thus the database that ensures data consistency and integrity. 
+
 
 ## Screenshots
+### Customer Side
+<p align="center">
+  <a href="https://github.com/saethrej/StretchingCapturingSystem">
+    <img src="screenshots/sc1.png" alt="Logo" width="190" height="400">
+    <img src="screenshots/sc2.png" alt="Logo" width="190" height="400">
+    <img src="screenshots/sc3.png" alt="Logo" width="190" height="400">
+    <img src="screenshots/sc4.png" alt="Logo" width="190" height="400">
+    <img src="screenshots/sc8.png" alt="Logo" width="190" height="400">
+  </a>
+</p>
 
+### Store Side
+<p align="center">
+  <a href="https://github.com/saethrej/StretchingCapturingSystem">
+    <img src="screenshots/sc6.png" alt="Logo" width="190" height="400">
+    <img src="screenshots/sc7.png" alt="Logo" width="190" height="400">
+
+  </a>
+</p>
 
 ## Authors
 We are four students that have recently graduated with a BSc. in Computer Science from ETH Zurich and will start our master's degree this fall.
 * [Jens Eirik Saethre (@saethrej)](https://linkedin.com/in/saethrej)
-* [André Gaillard (@andregail)]()
+* [André Gaillard (@andregail)](https://www.linkedin.com/in/andre-gaillard-811852183/)
 * [Livio Schläpfer (@livioschlaepfer)](https://www.linkedin.com/in/livio-schl%C3%A4pfer-b34607179/)
 * [Christopher Raffl (@rafflc)](https://www.linkedin.com/in/christopher-raffl-94a2a4180/)
 
