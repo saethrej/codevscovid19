@@ -26,7 +26,7 @@ class FullStoreInformation{
     int store_id;
     String address;
     String city;
-    String zip_code;
+    int zip_code;
     String canton;
     String country;
     double latitude;
@@ -140,8 +140,8 @@ class PersistenJSONConverter {
     return instance;
   }
 
-  Map<int, ReservationInformation> JSONToMap(String jsonobj){
-    Map res = Map<int, ReservationInformation>();
+  Map<int, ReservationInformation> jsonToMap(String jsonobj){
+    Map<int, ReservationInformation> res = Map<int, ReservationInformation>();
     var map = jsonDecode(jsonobj);
     for(var i = 0; i < map.length; i++){
       int storeID = map[i]['storeID'];
@@ -151,19 +151,24 @@ class PersistenJSONConverter {
       String time = map[i]['time'];
       ReservationInformation inf = ReservationInformation(storeID,
       storeName,qrHash,date,time);
-      res.putIfAbsent(map[i].storeID, () => inf);
+      res.putIfAbsent(map[i]['storeID'], () => inf);
     }
-    print(res);
     return res;
   }
 
-  dynamic MaptoJSON(Map<int, ReservationInformation> map){
-    List tmpList = List();
+  dynamic mapToJSON(Map<int, ReservationInformation> map){
+    List res= List();
     map.forEach((k,v) {
-      tmpList.add(v);
+      var obj = {
+        'storeID': v.storeID,
+        'storeName': v.storeName,
+        'qrHash': v.qrHash,
+        'date' : v.date,
+        'time' : v.time
+      };
+      res.add(obj);
     });
-    print(jsonEncode(tmpList));
-    return jsonEncode(tmpList);
+    return res;
   }
 
 
