@@ -51,6 +51,20 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
       success = false;
     });
   }
+  // get available slots based on slected date
+  Future<void> _getAvailableSlots({String date}) async {
+    print("Get Reservations for store $storeId at $date");
+    await request.requestTimes(storeId, date, "")
+      .then((value) {
+        setState(() {
+          reservationSlots = value;
+          loading = false;
+        });
+      })
+      .catchError((e) {
+        print(e.toString());
+    });                     
+  }
 
   Future<void> postReservation({String date, String time}) async {
     TemporaryReservationObject cur;
@@ -76,6 +90,7 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
         if (value) {
           setState(() {
             success = true;
+            _getAvailableSlots();
           });
         }
       })
@@ -116,7 +131,7 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
             ),
             FlatButton(
               onPressed: () {
-                postReservation(date: selectedDate, time: reservationSlots[index].item2.toString());
+                postReservation(date: selectedDate, time: reservationSlots[index].item1.toString());
               },
               child: Card(
                 color: Colors.blue,
