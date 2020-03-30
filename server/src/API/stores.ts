@@ -4,7 +4,7 @@ import { logger } from '../logger'
 import { Request, Response } from 'express'
 import {
     db_getStoresInRectangle,
-    db_getPeopleInStore,
+    db_getStoreUtil,
     db_getStoreData,
     db_getDailyHistory
 } from '../utils/db_ops'
@@ -43,8 +43,9 @@ exports.locations = function (req: Request, res: Response) {
             let stores = result
             let counter = stores.length
             stores.forEach(function (store: any) {
-                db_getPeopleInStore(DB, store.store_id, function (result: any) {
-                    store.people_in_store = result
+                db_getStoreUtil(DB, store.store_id, function (result: any) {
+                    store.people_in_store = result[0]
+                    store.max_people = result[1]
                     counter = counter - 1
                     if (counter <= 0) {
                         let reply = {
