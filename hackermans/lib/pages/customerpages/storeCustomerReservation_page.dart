@@ -50,6 +50,7 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
     //getCurrentCount(storeId);
   }
 
+  /*
   // get available slots based on slected date
   Future<void> _getAvailableSlots({String date}) async {
     print("Get Reservations for store ${storeInfo.store_id} at $date");
@@ -67,6 +68,7 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
         print(e.toString());
     });               
   }
+  */
 
   Future<void> postReservation({String date, String time}) async {
     TemporaryReservationObject cur;
@@ -95,7 +97,7 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
         if (value) {
           setState(() {
             success = true;
-            _getAvailableSlots();
+            //_getAvailableSlots();
           });
         }
       })
@@ -137,6 +139,7 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
             FlatButton(
               onPressed: () {
                 postReservation(date: selectedDate, time: reservationSlots[index].item1.toString());
+                Timer.periodic(refreshRate, (Timer t) => setState((){}));
               },
               child: Card(
                 color: Colors.blue,
@@ -223,7 +226,7 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text('Reservations', style: Styles.headerLight,),
-                          Text('Migros Zürich HB', style: Styles.header,),
+                          Text('Migros ${storeInfo.address}', style: Styles.header,),
                         ],
                       ),
                     ],
