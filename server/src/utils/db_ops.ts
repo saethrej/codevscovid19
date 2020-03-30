@@ -450,3 +450,29 @@ export function db_getDailyHistory(dbcon: any, store_id: number, date: string, c
         }
     })
 }
+
+/** brief: returns an array with the current number in store and max people allowed
+ * 
+ * @param dbcon the database connection 
+ * @param store_id id of the store
+ * @param callback function from the caller to return result 
+ * @returns [people_in_store, max_people]
+ * 
+ * @throws exception if the query fails 
+ */
+export function db_getStoreUtil(dbcon: any, store_id: number, callback: any)
+{
+    var sql = "SELECT people_in_store, max_people FROM Stores WHERE store_id = ?"
+
+    dbcon.query(sql, [store_id], function(err: any, result: any, fields: any) {
+        // log and throw error if the query fails
+        if (err) {
+            logger.error(err)
+            throw err
+        }
+        var res = [];
+        res.push(result[0]['people_in_store'])
+        res.push(result[0]['max_people'])
+        callback(res);
+    })
+}
