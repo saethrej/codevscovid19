@@ -49,6 +49,14 @@ class TemporaryReservationObject {
 
 class PersistenJSONConverter {
 
+  PersistenJSONConverter._privateConstructor(){
+  }
+  static final PersistenJSONConverter instance = PersistenJSONConverter._privateConstructor();
+
+  factory PersistenJSONConverter(){
+    return instance;
+  }
+
   static Map<int, ReservationInformation> JSONToMap(String jsonobj){
     Map res = Map<int, ReservationInformation>();
     var map = jsonDecode(jsonobj)['map'];
