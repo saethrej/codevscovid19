@@ -133,7 +133,7 @@ export function db_increase(dbcon: any, store_id: number, callback: any)
                 if (result.length == 0) {
                     // add first customer of the day to the array
                     newArray[d.getHours()] += 1
-                    dbcon.query("INSERT INTO History (store_id, date, customers) VALUES (?, ?, ?)", [store_id, date, JSON.stringify(newArray)], function(err: any, result: any, fields: any) {ichffasf
+                    dbcon.query("INSERT INTO History (store_id, date, customers) VALUES (?, ?, ?)", [store_id, date, JSON.stringify(newArray)], function(err: any, result: any, fields: any) {
                         // if an error occurs here, only log it - we can live with a faulty history DB
                         if (err) {
                             logger.error(err)
