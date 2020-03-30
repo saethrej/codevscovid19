@@ -4,12 +4,13 @@ import 'dart:convert';
 class StoreInformation{
   double longitude;
   double latitude;
-  double numPeople;
+  int numPeople;
   int id;
 
   StoreInformation({this.longitude, this.latitude, this.numPeople, this.id});
 
   factory StoreInformation.fromJson(Map<String, dynamic> json){
+    print(json['longitude']);
     return StoreInformation(
       longitude: json['longitude'],
       latitude: json['latitude'],

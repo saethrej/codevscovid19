@@ -20,13 +20,19 @@ class HTTPRequest {
   //@params tuple of latitude, longitude
   // return a mapping from store ID to its information
   Future<List<StoreInformation>> sendCoordinates(Tuple2<double, double> position, Tuple2<double, double> left, Tuple2<double, double> right, Tuple2<double, double> up, Tuple2<double, double> down) async{
-    final uri = Uri.http('localhost:8000', '/getLocations');
-    var jsonString = json.encode({
-      "position": position.toList(),
-      "up": up.toList(),
-      "down": down.toList(),
-      "right": right.toList(),
-      "left": left.toList()
+    final uri = Uri.http(server, '/getLocations');
+    var a = position.toList();
+    var b = up.toList();
+    var c = down.toList();
+    var d = left.toList();
+    var e = right.toList();
+    var jsonString =
+    json.encode({
+      'position': a,
+      'up': b,
+      'down': c,
+      'left': d,
+     'right':e
     });
     print('before');
     final http.Response response = await http.post(uri, headers: <String, String> {
@@ -37,30 +43,33 @@ class HTTPRequest {
     if(response.statusCode == 200){
        List closeStores = List<StoreInformation>();
       var stores = jsonDecode(response.body)['stores'];
+      print(stores);
       for(var i =0; i<stores.length; i++){
-        var inf = StoreInformation.fromJson(json.decode(stores[i]));
+        var inf = StoreInformation.fromJson(stores[i]);
         closeStores.add(inf);
       }
-      print(closeStores);
       return closeStores;
     }
     else {
+      print(response.statusCode);
       throw Exception("Failed to put current location");
     }
   }
 
     //@TODO Needs header completion
-    Future<List<Tuple2<String, int>>> requestTimes(int storeID, String date, String time) async{
-      final uri = Uri.http('localhost:8000', '/getavailableReservation');
-      var jsonString = json.encode({'storeId': storeID, 'date': date,
-      'time': time});
+    Future<List<Tuple2<String, int>>> requestTimes(int storeID, String date) async{
+      final uri = Uri.http(server, '/getavailableReservation');
+      var jsonString = json.encode({'storeId': storeID, 'date': date});
       final http.Response response = await http.post(uri, headers: <String, String> {
       'Content-Type': 'application/json' },
       body: jsonString);
       List<Tuple2<String, int>>  times = List<Tuple2<String, int>> ();
       if(response.statusCode == 200){
         var timesNoFormat = jsonDecode(response.body)['reservations'];
-        //print(timesNoFormat);
+        if(times == null){
+          return null;
+        }
+        print(timesNoFormat);
         for(var i = 0; i<timesNoFormat.length; i++){
           times.add(Tuple2(timesNoFormat[i]['time'].toString(), timesNoFormat[i]['slots']));
         }

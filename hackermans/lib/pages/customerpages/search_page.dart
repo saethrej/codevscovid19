@@ -8,6 +8,9 @@ import 'package:hackermans/styles/styles.dart';
 import 'package:mapbox_search/mapbox_search.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as maps;
+import 'package:tuple/tuple.dart';
+
+import '../../src/HTTPRequests.dart';
 
 
 class SearchPage extends StatefulWidget{
@@ -127,12 +130,18 @@ class _SearchPageState extends State<SearchPage> {
           style: Styles.headlineLight,
           onSubmitted: (text) {
             if (text == 'loginStoreUser'){
-              //timer.cancel();
+              timer.cancel();
               Navigator.push(
                 context, 
                 MaterialPageRoute(builder: (BuildContext context) => LoginPage())
               );
-            }
+            } else if (text == 'counterup'){
+              HTTPRequest req = HTTPRequest();
+              print('here');
+              req.counterUp(1);
+              //req.requestTimes(1, '2020-03-30', '1125');
+              req.sendCoordinates(Tuple2(47.233738, 8.832623), Tuple2(47.232497, 8.818969),  Tuple2(47.229899, 8.836188), Tuple2(47.235714, 8.826012), Tuple2(47.220021, 8.830000));
+              }
           },
         ),
       ),
