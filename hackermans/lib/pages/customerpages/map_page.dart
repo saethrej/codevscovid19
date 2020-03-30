@@ -46,8 +46,8 @@ class _FullMapState extends State<FullMap> {
   bool loading = false;
   LatLng curPosition;
   CameraPosition initialCameraPosition = CameraPosition(
-    target: LatLng(47.39, 8.55),
-    zoom: 12,
+    target: LatLng(47.39, 8.54),
+    zoom: 13,
   );
 
   @override

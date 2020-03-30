@@ -15,9 +15,9 @@ class BookedReservationPage extends StatefulWidget{
 }
 
 class _BookedReservationPageState extends State<BookedReservationPage> {
-  List<ReservationInformation> storedReservations = List<ReservationInformation>();
+  List<ReservationInformation> storedReservations;
 
-  Widget _buildQRCode(BuildContext context){
+  Widget _buildQRCode(BuildContext context, String qrCode){
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Expanded(
@@ -25,7 +25,7 @@ class _BookedReservationPageState extends State<BookedReservationPage> {
           height: 200,
           width: 200,
           child: QrImage(
-            data: "1234567890",
+            data: qrCode,
             version: QrVersions.auto,
           ),
         ),
@@ -42,6 +42,7 @@ class _BookedReservationPageState extends State<BookedReservationPage> {
       controller: PageController(viewportFraction: 0.8),
         itemCount: storedReservations.length,
         itemBuilder: (context, index){
+          var item = storedReservations[index];
           return Padding(
             padding: const EdgeInsets.only(top: 20, bottom: 200),
             child: Card(
@@ -54,11 +55,23 @@ class _BookedReservationPageState extends State<BookedReservationPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text('Migros Rapperswil', style: Styles.headline),
+                        Text('${item.storeName}', style: Styles.headline),
                       ],
                     ),
-                    Text(storedReservations[index].time, style: Styles.headerLight),
-                    _buildQRCode(context)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          (item.time.toString().length != 4) ? '${item.time.toString().substring(item.time.toString().length-3,item.time.toString().length-2 )}' :'${item.time.toString().substring(item.time.toString().length-4,item.time.toString().length-2 )}', 
+                          style: Styles.headerLight,
+                          ),
+                        Text(':', style: Styles.headline,),
+                        Text('${item.time.toString().substring(item.time.toString().length-2)}',
+                         style: Styles.headerLight,
+                        ),
+                      ],
+                    ),
+                    _buildQRCode(context, item.qrHash)
                   ],
                 ),
               )
@@ -71,6 +84,9 @@ class _BookedReservationPageState extends State<BookedReservationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final appData = Provider.of<AppData>(context);
+    storedReservations = appData.storedReservations;
+    
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
