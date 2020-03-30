@@ -90,6 +90,7 @@ class _StoreCustomerPageState extends State<StoreCustomerPage> {
           padding: const EdgeInsets.only(top: 15.0),
           child: Row(
             children:[
+              SizedBox(width: 10),
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
