@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +67,8 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
 
     //create reservations object
     // TODO: randomize qrcode
-    var curReservation  =  ReservationInformation(cur.storeID, storeName, "rtre" , cur.date, cur.time);
+    var rng = Random();
+    var curReservation  =  ReservationInformation(cur.storeID, storeName, rng.nextInt(20000).toString() , cur.date, cur.time);
 
     await request.reserve(cur.storeID, cur.reservationID, curReservation.qrHash , cur.date, cur.time)
       .then((value) {
