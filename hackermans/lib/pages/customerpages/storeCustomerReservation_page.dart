@@ -17,17 +17,19 @@ import 'package:tuple/tuple.dart';
 List<Tuple2<String, int>> reservationSlots = List<Tuple2<String, int>>();
 bool loading = true;
 String selectedDate;
-int storeId;
-String storeName;
+FullStoreInformation storeInfo;
 
 class StoreCustomerReservationPage extends StatefulWidget{
+
+  StoreCustomerReservationPage(storeId);
+
   @override
   _StoreCustomerReservationPageState createState() => _StoreCustomerReservationPageState();
 }
 
 class _StoreCustomerReservationPageState extends State<StoreCustomerReservationPage> {
   HTTPRequest request = HTTPRequest();
-  Duration refreshRate = Duration(seconds: 4);
+  Duration refreshRate = Duration(seconds: 2);
   Timer timer;
 
   bool success = false;
@@ -48,20 +50,13 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
     //getCurrentCount(storeId);
   }
 
-  void _resetSnackBar(){
-    setState(() {
-      print('Snackbar deactivated');
-      sleep(Duration(seconds: 3));
-      success = false;
-    });
-  }
   // get available slots based on slected date
   Future<void> _getAvailableSlots({String date}) async {
-    print("Get Reservations for store $storeId at $date");
+    print("Get Reservations for store ${storeInfo.store_id} at $date");
     setState(() {
       loading = true;
     });
-    await request.requestTimes(storeId, date)
+    await request.requestTimes(storeInfo.store_id, date)
       .then((value) {
         setState(() {
           reservationSlots = value;
@@ -75,8 +70,8 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
 
   Future<void> postReservation({String date, String time}) async {
     TemporaryReservationObject cur;
-    print("Get Reservations for store $storeId at $date");
-    await request.preReserve(storeId, date, time)
+    print("Get Reservations for store ${storeInfo.store_id} at $date");
+    await request.preReserve(storeInfo.store_id, date, time)
       .then((value) {
         setState(() {
           cur = value;
@@ -89,7 +84,7 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
     //create reservations object
     // TODO: randomize qrcode
     var rng = Random();
-    var curReservation  =  ReservationInformation(cur.storeID, storeName, rng.nextInt(20000).toString() , cur.date, cur.time);
+    var curReservation  =  ReservationInformation(cur.storeID, 'Migros ${storeInfo.address}, ${storeInfo.city}', rng.nextInt(20000).toString() , cur.date, cur.time);
 
     storedReservations.add(curReservation);
     newReservation = true;
@@ -202,8 +197,7 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
   @override
   Widget build(BuildContext context) {
     final appData = Provider.of<AppData>(context);
-    storeName = appData.storeName;
-    storeId = appData.storeID;
+    storeInfo = appData.storeInfo;
     if (newReservation) {
       appData.updateReservations(storedReservations);
 
@@ -274,8 +268,8 @@ class _CalendarBodyState extends State<CalendarBody> {
 
   // get available slots based on slected date
   Future<void> _getAvailableSlots({String date}) async {
-    print("Get Reservations for store $storeId at $date");
-    await request.requestTimes(storeId, date)
+    print("Get Reservations for store ${storeInfo.store_id} at $date");
+    await request.requestTimes(storeInfo.store_id, date)
       .then((value) {
         setState(() {
           reservationSlots = value;

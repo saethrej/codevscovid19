@@ -11,7 +11,7 @@ class HTTPRequest {
   HTTPRequest._privateConstructor(){
   }
   static final HTTPRequest instance = HTTPRequest._privateConstructor();
-  static String server = '10.0.2.2:8000';
+  static String server = 'localhost:8000';
 
   factory HTTPRequest(){
     return instance;
@@ -174,7 +174,8 @@ class HTTPRequest {
     }
 
     else {
-      throw Exception('failed to get store data' + response.toString());
+      print(jsonDecode(response.body));
+      throw Exception('failed to get store data' + response.statusCode.toString());
     }
 
   }
