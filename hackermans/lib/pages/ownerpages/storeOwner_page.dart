@@ -41,6 +41,25 @@ class _StorePageState extends State<StorePage> {
     //getCurrentCount(storeId);
   }
 
+  void getStoreInformation(int storeId) async {
+    //Future<FullStoreInformation> getStoreData (int storeID) async{
+
+    print("Get information for store: $storeId");
+    await request.getStoreData(storeId)
+      .then((value) {
+        setState(() {
+          storeInfo = value;
+          maxUser = storeInfo.max_people;
+          currentUser = storeInfo.people_in_store;
+          loading = false;
+        });
+      })
+      .catchError((e) {
+        print(e.toString());
+    });                       
+  }
+
+
   void getCurrentCount(int storeId) async {
     print("Get count for store: $storeId");
     await request.getCounter(storeId)
@@ -171,6 +190,12 @@ class _StorePageState extends State<StorePage> {
   @override
   Widget build(BuildContext context) {
     final appData = Provider.of<AppData>(context);
+    
+    if (appData.storeInfo == null){
+      getStoreInformation(storeId);
+      appData.storeInfo = storeInfo;
+    }
+
     storeInfo = appData.storeInfo;
 
     return Stack(
@@ -178,7 +203,7 @@ class _StorePageState extends State<StorePage> {
         Scaffold(
           backgroundColor: (currentUser >= maxUser) ? Colors.red : Colors.white,
           body: SafeArea(
-            child: Padding(
+            child:(loading) ? WaitingBody() : Padding(
               padding: const EdgeInsets.all(25.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
