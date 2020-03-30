@@ -14,19 +14,19 @@ class StorePage extends StatefulWidget{
 
 class _StorePageState extends State<StorePage> {
   HTTPRequest request = HTTPRequest();
-  Duration refreshRate = Duration(seconds: 1);
+  Duration refreshRate = Duration(seconds: 5);
   Timer timer;
 
   int storeId = 1;
-  int currentUser;
-  int maxUser = 50;
+  int currentUser = 1;
+  int maxUser = 200;
   bool loading = true;
 
   @override
   initState(){
     super.initState();
     getCurrentCount(storeId);
-    //timer = Timer.periodic(refreshRate, (Timer t) => getCurrentCount(storeId));
+    timer = Timer.periodic(refreshRate, (Timer t) => getCurrentCount(storeId));
   }
 
   @override
@@ -168,7 +168,7 @@ class _StorePageState extends State<StorePage> {
     return Stack(
       children: [
         Scaffold(
-          backgroundColor: (currentUser == maxUser) ? Colors.red : Colors.white,
+          backgroundColor: (currentUser >= maxUser) ? Colors.red : Colors.white,
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(25.0),

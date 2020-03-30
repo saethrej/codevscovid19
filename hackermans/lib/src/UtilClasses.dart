@@ -14,8 +14,8 @@ class StoreInformation{
     return StoreInformation(
       longitude: json['longitude'],
       latitude: json['latitude'],
-        numPeople: json['people_in_store'],
-      id: json['id'],
+      numPeople: json['people_in_store'],
+      id: json['store_id'],
     );
   }
 }

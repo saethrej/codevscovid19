@@ -9,6 +9,7 @@ import 'package:hackermans/pages/ownerpages/scanQRCode_page.dart';
 import 'package:hackermans/src/HTTPRequests.dart';
 import 'package:hackermans/src/UtilClasses.dart';
 import 'package:hackermans/styles/styles.dart';
+import 'package:hackermans/styles/waitingScreen.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:tuple/tuple.dart';
@@ -26,15 +27,18 @@ class StoreCustomerReservationPage extends StatefulWidget{
 
 class _StoreCustomerReservationPageState extends State<StoreCustomerReservationPage> {
   HTTPRequest request = HTTPRequest();
-  Duration refreshRate = Duration(milliseconds: 500);
+  Duration refreshRate = Duration(seconds: 4);
   Timer timer;
 
   bool success = false;
+  bool newReservation = false;
+  List<ReservationInformation> storedReservations;
+
 
   @override
   initState(){
     super.initState();
-    timer = Timer.periodic(refreshRate, (Timer t) => setState((){}));
+    timer = Timer.periodic(refreshRate, (Timer t) => setState((){success = false;}));
   }
 
   @override
@@ -54,7 +58,10 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
   // get available slots based on slected date
   Future<void> _getAvailableSlots({String date}) async {
     print("Get Reservations for store $storeId at $date");
-    await request.requestTimes(storeId, date, "")
+    setState(() {
+      loading = true;
+    });
+    await request.requestTimes(storeId, date)
       .then((value) {
         setState(() {
           reservationSlots = value;
@@ -63,7 +70,7 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
       })
       .catchError((e) {
         print(e.toString());
-    });                     
+    });               
   }
 
   Future<void> postReservation({String date, String time}) async {
@@ -83,6 +90,9 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
     // TODO: randomize qrcode
     var rng = Random();
     var curReservation  =  ReservationInformation(cur.storeID, storeName, rng.nextInt(20000).toString() , cur.date, cur.time);
+
+    storedReservations.add(curReservation);
+    newReservation = true;
 
     await request.reserve(cur.storeID, cur.reservationID, curReservation.qrHash , cur.date, cur.time)
       .then((value) {
@@ -147,20 +157,24 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
     );
   }
 
+  Widget _listBody(BuildContext context){
+    return Expanded(
+      child: ListView.builder(
+        itemCount: reservationSlots.length,
+        itemBuilder: (context, index) {
+          return _reservationSlotRecord(context, index);
+        }
+      ),
+    );
+  }
+
   Widget _pageBody(BuildContext context){
     return Expanded(
       child: Column(
         children: <Widget>[
           CalendarBody(),
           SizedBox(height: 20),
-          Expanded(
-            child: ListView.builder(
-              itemCount: reservationSlots.length,
-              itemBuilder: (context, index) {
-                return _reservationSlotRecord(context, index);
-              }
-            ),
-          ),
+          (loading) ? WaitingBody() : _listBody(context)
         ],
       ),
     );
@@ -190,6 +204,12 @@ class _StoreCustomerReservationPageState extends State<StoreCustomerReservationP
     final appData = Provider.of<AppData>(context);
     storeName = appData.storeName;
     storeId = appData.storeID;
+    if (newReservation) {
+      appData.updateReservations(storedReservations);
+
+    } else {
+      storedReservations = appData.storedReservations;
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -255,7 +275,7 @@ class _CalendarBodyState extends State<CalendarBody> {
   // get available slots based on slected date
   Future<void> _getAvailableSlots({String date}) async {
     print("Get Reservations for store $storeId at $date");
-    await request.requestTimes(storeId, date, "")
+    await request.requestTimes(storeId, date)
       .then((value) {
         setState(() {
           reservationSlots = value;

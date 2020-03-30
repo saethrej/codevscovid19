@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hackermans/data/appData.dart';
 import 'package:hackermans/pages/ownerpages/scanQRCode_page.dart';
+import 'package:hackermans/src/UtilClasses.dart';
 import 'package:hackermans/styles/styles.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 
@@ -12,7 +15,7 @@ class BookedReservationPage extends StatefulWidget{
 }
 
 class _BookedReservationPageState extends State<BookedReservationPage> {
-
+  List<ReservationInformation> storedReservations = List<ReservationInformation>();
 
   Widget _buildQRCode(BuildContext context){
     return Padding(
@@ -31,10 +34,13 @@ class _BookedReservationPageState extends State<BookedReservationPage> {
   }
 
   Widget _pageBody(BuildContext context){
+    final appData = Provider.of<AppData>(context);
+    storedReservations = appData.storedReservations;
+
     return Expanded(
       child: PageView.builder(
       controller: PageController(viewportFraction: 0.8),
-        itemCount: 2,
+        itemCount: storedReservations.length,
         itemBuilder: (context, index){
           return Padding(
             padding: const EdgeInsets.only(top: 20, bottom: 200),
@@ -51,7 +57,7 @@ class _BookedReservationPageState extends State<BookedReservationPage> {
                         Text('Migros Rapperswil', style: Styles.headline),
                       ],
                     ),
-                    Text('17:00', style: Styles.headerLight),
+                    Text(storedReservations[index].time, style: Styles.headerLight),
                     _buildQRCode(context)
                   ],
                 ),
@@ -87,7 +93,13 @@ class _BookedReservationPageState extends State<BookedReservationPage> {
               ),
             ),
             SizedBox(height: 50),
-            _pageBody(context)
+            (storedReservations.isEmpty) ? Center(
+              child: SizedBox(
+                  width: 300,
+                  child: Wrap(children: [Text('You have no upcoming reservations.', style: Styles.headerLight)])
+                )
+            ) 
+            : _pageBody(context)
           ],
         ),
       ),

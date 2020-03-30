@@ -85,7 +85,6 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-
   Widget _buttonLayer(BuildContext context){
     final appData = Provider.of<AppData>(context);
 
@@ -96,7 +95,7 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               SizedBox(height: 60),
               _searchButton(context),
-              (!appData.QRCodeMap.isEmpty) ? Container(height: 0, width: 0) : _bookedReservationsButton(context),
+              (appData.storedReservations.isEmpty) ? Container(height: 0, width: 0) : _bookedReservationsButton(context),
               Spacer()
             ]
           )
