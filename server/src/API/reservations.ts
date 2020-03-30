@@ -16,11 +16,10 @@ exports.available = function (req: Request, res: Response) {
     let store_id: number = parseInt(req.body.storeId)
     let date: string = req.body.date
     var requestdate = new Date(date)
-    logger.info(requestdate)
-    var currentdate = new Date()
-    var datetime = currentdate.toISOString();
-    let date_today = datetime.slice(0, 10) // get todays date
-    let time_current = parseInt(datetime.slice(11, 13) + datetime.slice(14, 16)) + 200 //account for timezone difference
+    var tzOffset = new Date().getTimezoneOffset() * 60000
+    var currentdate: string = (new Date(Date.now() - tzOffset)).toISOString() //include time zone difference
+    let date_today = currentdate.slice(0, 10) // get todays date
+    let time_current = parseInt(currentdate.slice(11, 13) + currentdate.slice(14, 16)) 
     let cur_100 = time_current % 100
     if (cur_100 > 45) {
         time_current = time_current - cur_100 + 100
@@ -158,10 +157,11 @@ exports.confirm = function (req: Request, res: Response) {
 
 exports.next = function (req: Request, res: Response) {
     let store_id: number = parseInt(req.params.storeId)
-    var currentdate = new Date()
-    var datetime = currentdate.toISOString();
-    let date_today = datetime.slice(0, 10) // get todays date
-    let time_current = parseInt(datetime.slice(11, 13) + datetime.slice(14, 16)) + 200 //account for timezone difference
+    var tzOffset = new Date().getTimezoneOffset() * 60000
+    var now = (new Date(Date.now() - tzOffset))
+    var currentdate: string = now.toISOString() //include time zone difference
+    let date_today = currentdate.slice(0, 10) // get todays date
+    let time_current = parseInt(currentdate.slice(11, 13) + currentdate.slice(14, 16)) 
     let cur_100 = time_current % 100
     if (cur_100 > 45) {
         time_current = time_current - cur_100 + 100
@@ -176,7 +176,7 @@ exports.next = function (req: Request, res: Response) {
         time_current = time_current - cur_100 + 15
     }
     var weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
-    let weekday = weekdays[currentdate.getDay()] //get current weekday
+    let weekday = weekdays[now.getDay()] //get current weekday
 
     db_getStoreData(DB, store_id, function (result: any) {
         if (result == 0) {
