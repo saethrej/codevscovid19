@@ -39,7 +39,7 @@
     "express-winston": "^4.0.3",
     "glob": "^7.1.6",
     "glob-promise": "^3.4.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "mysql": "^2.18.1",
     "prettier": "^1.19.1",
     "reflect-metadata": "^0.1.13",
